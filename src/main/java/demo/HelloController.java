@@ -24,6 +24,6 @@ public class HelloController {
 		return Mono.just(
 			new MessageBoundary(
 				this.demo
-					.getAfekaDemoMessage() + "?!"));
+					.getAfekaDemoMessage() + "@@"));
 	}
 }
