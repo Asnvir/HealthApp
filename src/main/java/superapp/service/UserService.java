@@ -7,7 +7,7 @@ import superapp.boundary.UserBoundary;
 public interface UserService {
     Mono<UserBoundary> create(NewUserBoundary user);
 
-    Mono<UserBoundary> get();
+    Mono<UserBoundary> login(String userSuperApp, String email);
 
-    Mono<Void> update(UserBoundary user);
+    Mono<Void> updateUserDetails(String userSuperApp, String userEmail, UserBoundary userToUpdate);
 }
