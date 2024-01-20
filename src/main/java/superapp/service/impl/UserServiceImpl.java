@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
                 .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))))
                 .flatMap(userEntity -> updateUserEntity(userEntity, userToUpdate))
                 .flatMap(userRepository::save)
-                .doOnNext(unused -> logger.info("User details updated for userId: {}", userId))
+                .doOnSuccess(unused -> logger.info("User details updated for userId: {}", userId))
                 .log()
                 .then();
     }
