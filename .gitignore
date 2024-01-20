@@ -1,0 +1,14 @@
+# Gradle files
+.gradle/
+build/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Other common ignores
+*.log
+*.swp
+*~

@@ -1,4 +1,4 @@
-package demo;
+package superapp;
 
 public interface Demo {
 	public String getAfekaDemoMessage();
