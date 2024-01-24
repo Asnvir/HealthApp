@@ -60,6 +60,7 @@ public class NewUserBoundary {
                 .withUserId(new UserId(applicationName, this.email))
                 .withRole(UserRole.valueOf(this.role))
                 .withAvatar(this.avatar)
+                .withUserName(this.userName)
                 .build();
 
     }

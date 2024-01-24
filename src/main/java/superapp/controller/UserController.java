@@ -29,7 +29,7 @@ public class UserController {
         return userService.create(user);
     }
 
-    @GetMapping(path = "/{superapp}/{email}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "login/{superapp}/{email}", produces = APPLICATION_JSON_VALUE)
     public Mono<UserBoundary> login(@PathVariable("superapp") String superApp,
                                     @PathVariable String email) {
         logger.info("In controller login method - superApp: {} and email: {}", superApp, email);
