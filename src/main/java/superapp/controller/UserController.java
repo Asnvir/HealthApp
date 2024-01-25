@@ -15,7 +15,7 @@ import superapp.service.impl.UserServiceImpl;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(path = "users")
+@RequestMapping(path = "/users")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -29,7 +29,7 @@ public class UserController {
         return userService.create(user);
     }
 
-    @GetMapping(path = "login/{superapp}/{email}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/login/{superapp}/{email}", produces = APPLICATION_JSON_VALUE)
     public Mono<UserBoundary> login(@PathVariable("superapp") String superApp,
                                     @PathVariable String email) {
         logger.info("In controller login method - superApp: {} and email: {}", superApp, email);
