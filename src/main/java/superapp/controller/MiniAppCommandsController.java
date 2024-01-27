@@ -18,17 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
+@RequestMapping(path = "/miniapp/{miniAppName}")
 public class MiniAppCommandsController {
     private static final Logger logger = LoggerFactory.getLogger(MiniAppCommandServiceImpl.class);
 
     @Autowired
     private MiniAppCommandImpl miniAppCommandService;
     
-	@RequestMapping(path = { "/superapp/miniapp/{miniAppName}" }, method = { RequestMethod.POST }, produces = {
-			MediaType.APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE })
-	public Mono<MiniAppCommandBoundary> invokeMiniAppCommand(@RequestBody MiniAppCommandBoundary miniAppCommand,
+	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+	public Mono<MiniAppCommandBoundary> invokeMiniAppCommand(@RequestBody MiniAppCommandBoundary newMiniAppCommand,
 	{
-		logger.info("Received a request to invoke a new command {}", miniAppCommand);
-		return miniAppCommandService.invokeCommand(miniAppCommand);
+		logger.info("Received a request to invoke a new command {}", newMiniAppCommand);
+		return miniAppCommandService.invokeCommand(newMiniAppCommand);
 	}
 }

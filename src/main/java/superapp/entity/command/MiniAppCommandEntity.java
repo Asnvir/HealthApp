@@ -1,10 +1,5 @@
 package superapp.entity.command;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Objects;
-
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -13,7 +8,7 @@ import java.util.TreeMap;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 
-@Document(collection = "MiniAppCommand")
+@Document(collection = "MINIAPPSCOMMANDS")
 public class MiniAppCommandEntity {
 
 	@Id
@@ -34,7 +29,7 @@ public class MiniAppCommandEntity {
 		this.commandId = commandId;
 		this.command = command;
 		this.targetObject = targetObject;
-		this.invocationTimestamp = new Date(); // updated here ??
+		this.invocationTimestamp = new Date();
 		this.invokedBy = invokedBy;
 		this.commandAttributes = commandAttributes;
 	}
@@ -86,6 +81,23 @@ public class MiniAppCommandEntity {
 
 	public void setCommandAttributes(Map<String, Object> commandAttributes) {
 		this.commandAttributes = commandAttributes;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(commandId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MiniAppCommandEntity other = (MiniAppCommandEntity) obj;
+		return Objects.equals(commandId, other.commandId);
 	}
 
 	@Override

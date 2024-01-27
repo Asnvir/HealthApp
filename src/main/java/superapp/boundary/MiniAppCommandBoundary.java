@@ -4,9 +4,14 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import superapp.entity.user.UserId;
 import superapp.entity.command.TargetObject;
 import superapp.entity.command.InvokedBy;
 import superapp.entity.command.CommandId;
+import superapp.entity.command.ObjectId;
+import superapp.entity.command.CommandAttributes;
+import superapp.entity.command.CommandSubAttribute;
+import superapp.entity.command.MiniAppCommandEntity;
 
 public class MiniAppCommandBoundary {
 	private CommandId commandId;
@@ -22,6 +27,7 @@ public class MiniAppCommandBoundary {
 
 	public MiniAppCommandBoundary(CommandId commandId, String command, TargetObject targetObject,
 			Date invocationTimestamp, InvokedBy invokedBy, Map<String, Object> commandAttributes) {
+		super();
 		this.commandId = commandId;
 		this.command = command;
 		this.targetObject = targetObject;
@@ -77,6 +83,16 @@ public class MiniAppCommandBoundary {
 	public void setCommandAttributes(Map<String, Object> commandAttributes) {
 		this.commandAttributes = commandAttributes;
 	}
+	
+    public MiniAppCommandEntity toEntity(String applicationName) {
+        return new MiniAppCommandEntity(
+        		this.commandId,
+        		this.command,
+        		this.targetObject,
+        		this.invocationTimestamp,
+        		this.invokedBy,
+        		this.commandAttributes);        		
+    }
 
 	@Override
 	public String toString() {
