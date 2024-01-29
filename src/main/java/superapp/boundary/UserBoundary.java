@@ -57,6 +57,16 @@ public class UserBoundary {
                 .build();
     }
 
+//    public static UserBoundary fromEntity(UserEntity userEntity) {
+//        UserId userId = userEntity.getUserId();
+//        UserRole role = userEntity.getRole();
+//        String userName = userEntity.getUserName();
+//        String avatar = userEntity.getAvatar();
+//
+//        return new UserBoundary(userId, role, userName, avatar);
+//    }
+
+
     @Override
     public String toString() {
         return "UserBoundary{" +
