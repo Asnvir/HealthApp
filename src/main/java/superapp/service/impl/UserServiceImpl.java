@@ -28,7 +28,6 @@ public class UserServiceImpl implements UserService {
     private Environment environment;
 
     public UserServiceImpl(UserRepository userRepository) {
-        super();
         this.userRepository = userRepository;
     }
 
