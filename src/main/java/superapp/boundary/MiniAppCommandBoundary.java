@@ -92,14 +92,12 @@ public class MiniAppCommandBoundary {
 	
 	public MiniAppCommandEntity toEntity(String superAppName) {
 		MiniAppCommandEntity newEntity = new MiniAppCommandEntity();
-		CommandId newDefaultCommandId = new CommandId(superAppName, "dummyApp");
-		newDefaultCommandId.setID(UUID.randomUUID() + "");
-		newEntity.setCommandId(newDefaultCommandId);
+		newEntity.setCommandId(commandId);
 		newEntity.setCommandAttributes(commandAttributes);
 		newEntity.setCommand(command);
 		newEntity.setInvocationTimestamp(invocationTimestamp);
-		newEntity.setInvokedBy(new InvokedBy(new UserId(superAppName, invokedBy.getUserId().getEmail())));
-		newEntity.setTargetObject(new TargetObject(new ObjectId(superAppName, UUID.randomUUID() + "")));
+		newEntity.setInvokedBy(invokedBy);
+		newEntity.setTargetObject(targetObject);
 		return newEntity;
 	}
 

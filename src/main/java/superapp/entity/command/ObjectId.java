@@ -18,6 +18,10 @@ public class ObjectId {
     public String getSuperapp() {
         return superapp;
     }
+    
+    public void setID(String newID) {
+        this.id = newID;
+    }  
 
     public void setSuperapp(String superapp) {
         this.superapp = superapp;
