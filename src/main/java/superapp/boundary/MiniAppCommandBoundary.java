@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import superapp.entity.command.TargetObject;
+import superapp.entity.user.UserEntity;
 import superapp.entity.user.UserId;
 import superapp.entity.command.InvokedBy;
 import superapp.entity.command.MiniAppCommandEntity;
@@ -24,6 +25,15 @@ public class MiniAppCommandBoundary {
 		this.commandAttributes = new TreeMap<>();
 	}
 
+	public MiniAppCommandBoundary(MiniAppCommandEntity entity) {
+		this.commandId = entity.getCommandId();
+		this.command = entity.getCommand();
+		this.targetObject = entity.getTargetObject();
+		this.invocationTimestamp = entity.getInvocationTimestamp();
+		this.invokedBy = entity.getInvokedBy();
+		this.commandAttributes = entity.getCommandAttributes();
+	}
+
 	public MiniAppCommandBoundary(CommandId commandId, String command, TargetObject targetObject,
 			Date invocationTimestamp, InvokedBy invokedBy, Map<String, Object> commandAttributes) {
 		super();
@@ -34,6 +44,8 @@ public class MiniAppCommandBoundary {
 		this.invokedBy = invokedBy;
 		this.commandAttributes = commandAttributes;
 	}
+
+
 
 	public CommandId getCommandId() {
 		return commandId;
