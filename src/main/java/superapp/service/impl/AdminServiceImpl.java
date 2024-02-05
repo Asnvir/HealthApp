@@ -9,13 +9,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.MiniAppCommandBoundary;
 import superapp.boundary.UserBoundary;
-import superapp.entity.command.CommandId;
-import superapp.entity.user.UserId;
+
 import superapp.repository.MiniAppCommandsRepository;
+import superapp.repository.ObjectRepository;
 import superapp.repository.UserRepository;
 import superapp.service.AdminService;
 
-import static superapp.common.Consts.APPLICATION_NAME;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -23,15 +22,18 @@ public class AdminServiceImpl implements AdminService {
     private static final Logger logger = LoggerFactory.getLogger(AdminServiceImpl.class);
 
     private final UserRepository userRepository;
+    private final ObjectRepository objectRepository;
     private final MiniAppCommandsRepository miniAppCommandsRepository;
-    //private final ObjectsRepository objectsRepository;
     @Autowired
     private Environment environment;
 
-    public AdminServiceImpl(UserRepository userRepository, MiniAppCommandsRepository miniAppCommandsRepository) {
+    public AdminServiceImpl(UserRepository userRepository,
+                            MiniAppCommandsRepository miniAppCommandsRepository,
+                            ObjectRepository objectRepository
+    ) {
         this.userRepository = userRepository;
         this.miniAppCommandsRepository = miniAppCommandsRepository;
-        //this.objectsRepository = objectsRepository;
+        this.objectRepository = objectRepository;
     }
 
 
@@ -41,11 +43,11 @@ public class AdminServiceImpl implements AdminService {
         return userRepository.deleteAll();
     }
 
-    /*@Override
+    @Override
     public Mono<Void> deleteAllObjects() {
         logger.info("Deleting all objects in AdminServiceImpl");
-        return objectsRepository.deleteAll();
-    }*/
+        return objectRepository.deleteAll();
+    }
 
     @Override
     public Mono<Void> deleteAllCommandsHistory() {

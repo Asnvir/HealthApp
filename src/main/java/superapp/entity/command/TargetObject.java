@@ -1,5 +1,7 @@
 package superapp.entity.command;
 
+import superapp.entity.common.ObjectId;
+
 import java.io.Serializable;
 
 public class TargetObject implements Serializable {

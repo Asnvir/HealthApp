@@ -4,16 +4,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import superapp.boundary.MiniAppCommandBoundary;
-import superapp.entity.user.UserEntity;
-import superapp.entity.user.UserId;
-import superapp.entity.user.UserRole;
-import superapp.entity.user.UserEntity.Builder;
-import superapp.service.impl.MiniAppCommandImpl;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
@@ -21,136 +13,135 @@ import org.springframework.data.annotation.Id;
 @Document(collection = "MINIAPPSCOMMANDS")
 public class MiniAppCommandEntity {
 
-	@Id
-	private CommandId commandId;
-	private String command;
-	private TargetObject targetObject;
-	private Date invocationTimestamp;
-	private InvokedBy invokedBy;
-	private Map<String, Object> commandAttributes;
-	private static final Logger logger = LoggerFactory.getLogger(MiniAppCommandEntity.class);
+    @Id
+    private CommandId commandId;
+    private String command;
+    private TargetObject targetObject;
+    private Date invocationTimestamp;
+    private InvokedBy invokedBy;
+    private Map<String, Object> commandAttributes;
+    private static final Logger logger = LoggerFactory.getLogger(MiniAppCommandEntity.class);
 
-	public MiniAppCommandEntity() {
-		this.commandAttributes = new TreeMap<>();
-	}
-
-	public MiniAppCommandEntity(CommandId commandId, String command, TargetObject targetObject,
-			Date invocationTimestamp, InvokedBy invokedBy, Map<String, Object> commandAttributes) {
-		this.commandId = commandId;
-		this.command = command;
-		this.targetObject = targetObject;
-		this.invocationTimestamp = new Date();
-		this.invokedBy = invokedBy;
-		this.commandAttributes = commandAttributes;
-	}
-	
-    private MiniAppCommandEntity(Builder builder) {
-		this.commandId = builder.commandId;
-		this.command = builder.command;
-		this.targetObject = builder.targetObject;
-		this.invocationTimestamp = new Date();
-		this.invokedBy = builder.invokedBy;
-		this.commandAttributes = builder.commandAttributes;
-		logger.info("Attributes from new MiniAppCommandEntity:" +this.commandId+"," + this.command + "," + this.targetObject +"," +  this.invocationTimestamp +"," + this.invokedBy +"," + this.commandAttributes);
+    public MiniAppCommandEntity() {
+        this.commandAttributes = new TreeMap<>();
     }
 
-	@Id
-	public CommandId getCommandId() {
-		return commandId;
-	}
+    public MiniAppCommandEntity(CommandId commandId, String command, TargetObject targetObject,
+                                Date invocationTimestamp, InvokedBy invokedBy, Map<String, Object> commandAttributes) {
+        this.commandId = commandId;
+        this.command = command;
+        this.targetObject = targetObject;
+        this.invocationTimestamp = new Date();
+        this.invokedBy = invokedBy;
+        this.commandAttributes = commandAttributes;
+    }
 
-	public void setCommandId(CommandId commandId) {
-		this.commandId = commandId;
-	}
+    private MiniAppCommandEntity(Builder builder) {
+        this.commandId = builder.commandId;
+        this.command = builder.command;
+        this.targetObject = builder.targetObject;
+        this.invocationTimestamp = new Date();
+        this.invokedBy = builder.invokedBy;
+        this.commandAttributes = builder.commandAttributes;
+        logger.info("Attributes from new MiniAppCommandEntity:" + this.commandId + "," + this.command + "," + this.targetObject + "," + this.invocationTimestamp + "," + this.invokedBy + "," + this.commandAttributes);
+    }
 
-	public String getCommand() {
-		return command;
-	}
+    @Id
+    public CommandId getCommandId() {
+        return commandId;
+    }
 
-	public void setCommand(String command) {
-		this.command = command;
-	}
+    public void setCommandId(CommandId commandId) {
+        this.commandId = commandId;
+    }
 
-	public TargetObject getTargetObject() {
-		return targetObject;
-	}
+    public String getCommand() {
+        return command;
+    }
 
-	public void setTargetObject(TargetObject targetObject) {
-		this.targetObject = targetObject;
-	}
+    public void setCommand(String command) {
+        this.command = command;
+    }
 
-	public Date getInvocationTimestamp() {
-		return invocationTimestamp;
-	}
+    public TargetObject getTargetObject() {
+        return targetObject;
+    }
 
-	public void setInvocationTimestamp(Date invocationTimestamp) {
-		this.invocationTimestamp = invocationTimestamp;
-	}
+    public void setTargetObject(TargetObject targetObject) {
+        this.targetObject = targetObject;
+    }
 
-	public InvokedBy getInvokedBy() {
-		return invokedBy;
-	}
+    public Date getInvocationTimestamp() {
+        return invocationTimestamp;
+    }
 
-	public void setInvokedBy(InvokedBy invokedBy) {
-		this.invokedBy = invokedBy;
-	}
+    public void setInvocationTimestamp(Date invocationTimestamp) {
+        this.invocationTimestamp = invocationTimestamp;
+    }
 
-	public Map<String, Object> getCommandAttributes() {
-		return commandAttributes;
-	}
+    public InvokedBy getInvokedBy() {
+        return invokedBy;
+    }
 
-	public void setCommandAttributes(Map<String, Object> commandAttributes) {
-		this.commandAttributes = commandAttributes;
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(commandId);
-	}
-	
-	public MiniAppCommandBoundary toBoundary() {
-		MiniAppCommandBoundary newBound = new MiniAppCommandBoundary();
-		newBound.setCommandId(commandId);
-		newBound.setCommand(command);
-		newBound.setTargetObject(targetObject);
-		newBound.setInvocationTimestamp(invocationTimestamp);
-		newBound.setInvokedBy(invokedBy);
-		newBound.setCommandAttributes(commandAttributes);
-		return newBound;		
-	}
+    public void setInvokedBy(InvokedBy invokedBy) {
+        this.invokedBy = invokedBy;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MiniAppCommandEntity other = (MiniAppCommandEntity) obj;
-		return Objects.equals(commandId, other.commandId);
-	}
+    public Map<String, Object> getCommandAttributes() {
+        return commandAttributes;
+    }
 
-	@Override
-	public String toString() {
-		return "MiniAppCommandEntity ["
-				+ "commandId=" + commandId.toString()
-				+ ", command=" + command 
-				+ ", targetObject=" + targetObject.toString()
-				+ ", invocationTimestamp=" + invocationTimestamp 
-				+ ", invokedBy=" + invokedBy.toString()
-				+ ", commandAttributes=" + commandAttributes.toString()
-				+ "]";
-	}
-	
+    public void setCommandAttributes(Map<String, Object> commandAttributes) {
+        this.commandAttributes = commandAttributes;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(commandId);
+    }
+
+    public MiniAppCommandBoundary toBoundary() {
+        MiniAppCommandBoundary newBound = new MiniAppCommandBoundary();
+        newBound.setCommand(command);
+        newBound.setTargetObject(targetObject);
+        newBound.setInvocationTimestamp(invocationTimestamp);
+        newBound.setInvokedBy(invokedBy);
+        newBound.setCommandAttributes(commandAttributes);
+        return newBound;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MiniAppCommandEntity other = (MiniAppCommandEntity) obj;
+        return Objects.equals(commandId, other.commandId);
+    }
+
+    @Override
+    public String toString() {
+        return "MiniAppCommandEntity ["
+                + "commandId=" + commandId.toString()
+                + ", command=" + command
+                + ", targetObject=" + targetObject.toString()
+                + ", invocationTimestamp=" + invocationTimestamp
+                + ", invokedBy=" + invokedBy.toString()
+                + ", commandAttributes=" + commandAttributes.toString()
+                + "]";
+    }
+
     // Static inner Builder class
     public static class Builder {
-    	private CommandId commandId;
-    	private String command;
-    	private TargetObject targetObject;
-    	private Date invocationTimestamp;
-    	private InvokedBy invokedBy;
-    	private Map<String, Object> commandAttributes;
+        private CommandId commandId;
+        private String command;
+        private TargetObject targetObject;
+        private Date invocationTimestamp;
+        private InvokedBy invokedBy;
+        private Map<String, Object> commandAttributes;
 
         public Builder withCommandId(CommandId commandID) {
             this.commandId = commandID;
@@ -166,7 +157,7 @@ public class MiniAppCommandEntity {
             this.targetObject = targetObject;
             return this;
         }
-        
+
         public Builder withDate() {
             this.invocationTimestamp = new Date();
             return this;
@@ -176,7 +167,7 @@ public class MiniAppCommandEntity {
             this.invokedBy = invokedBy;
             return this;
         }
-        
+
         public Builder withCommandAttributes(Map<String, Object> commandAttributes) {
             this.commandAttributes = commandAttributes;
             return this;

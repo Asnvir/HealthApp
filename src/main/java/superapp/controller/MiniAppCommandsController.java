@@ -20,9 +20,11 @@ public class MiniAppCommandsController {
     private MiniAppCommandImpl miniAppCommandService;
     
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-	public Mono<MiniAppCommandBoundary> invokeMiniAppCommand(@RequestBody MiniAppCommandBoundary newMiniAppCommand)
+	public Mono<MiniAppCommandBoundary> invokeMiniAppCommand(
+			@PathVariable String miniAppName,
+			@RequestBody MiniAppCommandBoundary newMiniAppCommand)
 	{
 		logger.info("Received a request to invoke a new command {}", newMiniAppCommand);
-		return miniAppCommandService.invokeACommand(newMiniAppCommand);
+		return miniAppCommandService.invokeACommand(miniAppName,newMiniAppCommand);
 	}
 }

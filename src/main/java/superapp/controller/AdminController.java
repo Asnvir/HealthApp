@@ -13,7 +13,6 @@ import superapp.boundary.MiniAppCommandBoundary;
 import superapp.boundary.UserBoundary;
 import superapp.service.AdminService;
 
-import javax.print.attribute.standard.Media;
 
 @RestController
 @RequestMapping(path = "/admin")
@@ -26,6 +25,7 @@ public class AdminController {
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
+
     @DeleteMapping("/users")
     public Mono<Void> deleteAllUsers() {
         logger.info("Deleting all users in AdminController");
@@ -34,12 +34,12 @@ public class AdminController {
                 .doOnError(error -> logger.error("Error deleting users: {}", error.getMessage()));
     }
 
-    /*@DeleteMapping("/objects")
+    @DeleteMapping("/objects")
     public Mono<Void> deleteAllObjects() {
         return adminService.deleteAllObjects()
                 .doOnSuccess(success -> logger.info("All objects in MiniApp deleted successfully"))
                 .doOnError(error -> logger.error("Error deleting objects in MiniApp: {}", error.getMessage()));
-    }*/
+    }
 
     @DeleteMapping("/miniapp")
     public Mono<Void> deleteAllCommandsHistory() {

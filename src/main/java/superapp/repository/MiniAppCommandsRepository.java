@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import superapp.entity.command.CommandId;
 import superapp.entity.command.MiniAppCommandEntity;
-import superapp.entity.user.UserId;
+
 
 @Repository
 public interface MiniAppCommandsRepository extends

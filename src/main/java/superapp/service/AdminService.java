@@ -7,7 +7,7 @@ import superapp.boundary.UserBoundary;
 
 public interface AdminService {
     Mono<Void> deleteAllUsers();
-    //Mono<Void> deleteAllObjects();
+    Mono<Void> deleteAllObjects();
     Mono<Void> deleteAllCommandsHistory();
     Flux<UserBoundary> exportAllUsers();
     Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory();

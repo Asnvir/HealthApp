@@ -1,13 +1,16 @@
-package superapp.entity.command;
+package superapp.entity.common;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.Id;
 
-public class ObjectId {
-    private String superapp;
-    @JsonProperty("id")
+import java.io.Serializable;
+
+public class ObjectId implements Serializable {
+	private String superapp;
+	// Serializalbe?
+	@Id
     private String id;
-
-    public ObjectId() {
+	
+    public ObjectId() {  	
     }
 
     public ObjectId(String superapp, String id) {
@@ -18,24 +21,24 @@ public class ObjectId {
     public String getSuperapp() {
         return superapp;
     }
-    
-    public void setID(String newID) {
-        this.id = newID;
-    }  
 
     public void setSuperapp(String superapp) {
         this.superapp = superapp;
-    }    
-    public String getID() {
+    }
+
+    public String getId() {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {
-        return "ObjectId ["
+        return "UserId ["
                 + "superapp=" + superapp
-                + ", id=" + id
+                + ", Id=" + id
                 + "]";
     }
 }

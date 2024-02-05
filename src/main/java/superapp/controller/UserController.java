@@ -10,14 +10,13 @@ import reactor.core.publisher.Mono;
 import superapp.boundary.NewUserBoundary;
 import superapp.boundary.UserBoundary;
 import superapp.service.UserService;
-import superapp.service.impl.UserServiceImpl;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(path = "/users")
 public class UserController {
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;

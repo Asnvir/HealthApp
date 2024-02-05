@@ -34,7 +34,7 @@ public class CommandId {
     public void setMiniApp(String miniApp) {
         this.miniApp = miniApp;
     }
-    
+
     @Override
     public String toString() {
         return "CommandId ["
@@ -44,8 +44,8 @@ public class CommandId {
                 + "]";
     }
 
-	public void setID(String newID) {
-		this.id = newID;		
-	}
+    public void setID(String newID) {
+        this.id = newID;
+    }
 
 }

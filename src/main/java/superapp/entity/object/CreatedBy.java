@@ -1,15 +1,16 @@
-package superapp.entity.command;
-
+package superapp.entity.object;
 
 import superapp.entity.user.UserId;
 
-public class InvokedBy{
+public class CreatedBy {
 	private UserId userId;
 
-	public InvokedBy() {
+	
+	public CreatedBy() {
 	}
-
-	public InvokedBy(UserId userId) {
+	
+	public CreatedBy(UserId userId) {
+		super();
 		this.userId = userId;
 	}
 
@@ -23,9 +24,7 @@ public class InvokedBy{
 
 	@Override
 	public String toString() {
-		return "InvokedBy ["
-				+ this.userId.toString()
-				+ "]";
+		return "CreatedBy [userId=" + userId + "]";
 	}
-
+	
 }
