@@ -24,12 +24,14 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
     private final MiniAppCommandsRepository miniAppCommandsRepository;
+    //private final ObjectsRepository objectsRepository;
     @Autowired
     private Environment environment;
 
     public AdminServiceImpl(UserRepository userRepository, MiniAppCommandsRepository miniAppCommandsRepository) {
         this.userRepository = userRepository;
         this.miniAppCommandsRepository = miniAppCommandsRepository;
+        //this.objectsRepository = objectsRepository;
     }
 
 
@@ -48,7 +50,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Mono<Void> deleteAllCommandsHistory() {
         logger.info("Deleting all commands history in AdminServiceImpl");
-        return Mono.empty(); // Placeholder
+        return miniAppCommandsRepository.deleteAll();
     }
 
     @Override
