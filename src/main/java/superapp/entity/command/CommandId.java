@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CommandId {
     private String superapp;
+    @JsonProperty("miniapp")
     private String miniApp;
     @JsonProperty("id")
     private String id;

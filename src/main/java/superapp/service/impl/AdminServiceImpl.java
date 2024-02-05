@@ -67,9 +67,12 @@ public class AdminServiceImpl implements AdminService {
         return miniAppCommandsRepository.findAll().map(MiniAppCommandBoundary::new);
     }
 
+
     @Override
     public Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(String miniAppName) {
         logger.info("Exporting history of miniapp: " + miniAppName);
-        return miniAppCommandsRepository.findAllByMiniApp(miniAppName).map(MiniAppCommandBoundary:: new);
+        return miniAppCommandsRepository
+                .findByCommandIdMiniApp(miniAppName)
+                .map(MiniAppCommandBoundary::new);
     }
 }
