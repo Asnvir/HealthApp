@@ -7,18 +7,18 @@ import superapp.entity.user.UserEntity;
 public class NewUserBoundary {
     private String email;
     private String role;
-    private String userName;
+    private String username;
     private String avatar;
 
 
     public NewUserBoundary() {
     }
 
-    public NewUserBoundary(String email, String role, String userName, String avatar) {
+    public NewUserBoundary(String email, String role, String username, String avatar) {
         super();
         this.email = email;
         this.role = role;
-        this.userName = userName;
+        this.username = username;
         this.avatar = avatar;
     }
 
@@ -31,8 +31,8 @@ public class NewUserBoundary {
     }
 
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     public String getAvatar() {
@@ -47,8 +47,8 @@ public class NewUserBoundary {
         this.role = role;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setAvatar(String avatar) {
@@ -60,7 +60,7 @@ public class NewUserBoundary {
                 .withUserId(new UserId(applicationName, this.email))
                 .withRole(UserRole.valueOf(this.role))
                 .withAvatar(this.avatar)
-                .withUserName(this.userName)
+                .withUserName(this.username)
                 .build();
 
     }
@@ -70,7 +70,7 @@ public class NewUserBoundary {
         return "NewUserBoundary{" +
                 "email='" + email + '\'' +
                 ", role=" + role +
-                ", userName='" + userName + '\'' +
+                ", userName='" + username + '\'' +
                 ", avatar='" + avatar + '\'' +
                 '}';
     }

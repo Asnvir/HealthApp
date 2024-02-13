@@ -1,6 +1,6 @@
 package superapp.entity.command;
 
-import superapp.entity.common.ObjectId;
+import superapp.entity.object.ObjectId;
 
 import java.io.Serializable;
 

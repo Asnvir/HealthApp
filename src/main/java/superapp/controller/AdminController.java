@@ -12,7 +12,7 @@ import superapp.service.AdminService;
 
 
 @RestController
-@RequestMapping(path = "/admin")
+@RequestMapping(path = "${apiPrefix}/admin")
 public class AdminController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);

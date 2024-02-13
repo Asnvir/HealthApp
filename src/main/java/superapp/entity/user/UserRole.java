@@ -1,5 +1,5 @@
 package superapp.entity.user;
 
 public enum UserRole {
-    STUDENT, ADMIN
+    ADMIN, SUPERAPP_USER, MINIAPP_USER
 }

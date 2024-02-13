@@ -14,7 +14,7 @@ import superapp.service.UserService;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "${apiPrefix}/users")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -30,7 +30,7 @@ public class UserController {
 
     @GetMapping(path = "/login/{superapp}/{email}", produces = APPLICATION_JSON_VALUE)
     public Mono<UserBoundary> login(@PathVariable("superapp") String superApp,
-                                    @PathVariable String email) {
+                                    @PathVariable("email") String email) {
         logger.info("In controller login method - superApp: {} and email: {}", superApp, email);
 
         return userService.login(superApp, email);
@@ -38,7 +38,7 @@ public class UserController {
 
     @PutMapping(path = "/{superapp}/{userEmail}", consumes = APPLICATION_JSON_VALUE)
     public Mono<Void> updateUserDetails(@PathVariable("superapp") String superApp,
-                                        @PathVariable String userEmail,
+                                        @PathVariable("userEmail") String userEmail,
                                         @RequestBody UserBoundary userToUpdate) {
         logger.info("In controller updateUserDetails method - superApp: {}, userEmail: {}, userToUpdate: {}"
                 , superApp, userEmail, userToUpdate);

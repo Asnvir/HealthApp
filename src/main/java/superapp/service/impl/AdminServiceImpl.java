@@ -40,31 +40,31 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Mono<Void> deleteAllUsers() {
         logger.info("Deleting all users in AdminServiceImpl");
-        return userRepository.deleteAll();
+        return userRepository.deleteAll().log();
     }
 
     @Override
     public Mono<Void> deleteAllObjects() {
         logger.info("Deleting all objects in AdminServiceImpl");
-        return objectRepository.deleteAll();
+        return objectRepository.deleteAll().log();
     }
 
     @Override
     public Mono<Void> deleteAllCommandsHistory() {
         logger.info("Deleting all commands history in AdminServiceImpl");
-        return miniAppCommandsRepository.deleteAll();
+        return miniAppCommandsRepository.deleteAll().log();
     }
 
     @Override
     public Flux<UserBoundary> exportAllUsers() {
         logger.info("Exporting all users");
-        return userRepository.findAll().map(UserBoundary::new);
+        return userRepository.findAll().map(UserBoundary::new).log();
     }
 
     @Override
     public Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory() {
         logger.info("Exporting all Miniapps commands history");
-        return miniAppCommandsRepository.findAll().map(MiniAppCommandBoundary::new);
+        return miniAppCommandsRepository.findAll().map(MiniAppCommandBoundary::new).log();
     }
 
 
@@ -73,6 +73,6 @@ public class AdminServiceImpl implements AdminService {
         logger.info("Exporting history of miniapp: " + miniAppName);
         return miniAppCommandsRepository
                 .findByCommandIdMiniApp(miniAppName)
-                .map(MiniAppCommandBoundary::new);
+                .map(MiniAppCommandBoundary::new).log();
     }
 }

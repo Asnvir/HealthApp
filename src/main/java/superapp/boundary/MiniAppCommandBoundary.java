@@ -10,6 +10,7 @@ import superapp.entity.command.MiniAppCommandEntity;
 import superapp.entity.command.CommandId;
 
 public class MiniAppCommandBoundary {
+    private CommandId commandId;
     private String command;
     private TargetObject targetObject;
     private Date invocationTimestamp;
@@ -21,6 +22,7 @@ public class MiniAppCommandBoundary {
     }
 
     public MiniAppCommandBoundary(MiniAppCommandEntity entity) {
+        this.commandId = entity.getCommandId();
         this.command = entity.getCommand();
         this.targetObject = entity.getTargetObject();
         this.invocationTimestamp = entity.getInvocationTimestamp();
@@ -38,6 +40,13 @@ public class MiniAppCommandBoundary {
         this.commandAttributes = commandAttributes;
     }
 
+    public CommandId getCommandId() {
+        return commandId;
+    }
+
+    public void setCommandId(CommandId commandId) {
+        this.commandId = commandId;
+    }
 
     public String getCommand() {
         return command;
@@ -86,9 +95,9 @@ public class MiniAppCommandBoundary {
                 + ", commandAttributes=" + commandAttributes + "]";
     }
 
-    public MiniAppCommandEntity toEntity(String superAppName, String miniAppName) {
+    public MiniAppCommandEntity toEntity(String superAppName, String miniAppName, String id) {
         MiniAppCommandEntity newEntity = new MiniAppCommandEntity();
-        newEntity.setCommandId(new CommandId(superAppName, miniAppName));
+        newEntity.setCommandId(new CommandId(superAppName, miniAppName, id));
         newEntity.setCommandAttributes(commandAttributes);
         newEntity.setCommand(command);
         newEntity.setInvocationTimestamp(invocationTimestamp);

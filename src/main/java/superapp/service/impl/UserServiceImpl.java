@@ -16,6 +16,11 @@ import superapp.repository.UserRepository;
 import superapp.service.UserService;
 
 
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
+
+import static ch.qos.logback.core.util.OptionHelper.isNullOrEmpty;
 import static superapp.common.Consts.APPLICATION_NAME;
 
 @Service
@@ -35,6 +40,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<UserBoundary> create(@RequestBody NewUserBoundary user) {
         logger.info("Creating user {}", user);
+        validateUser(user);
         UserEntity userEntity = user.toEntity(environment.getProperty(APPLICATION_NAME));
         return userRepository.save(userEntity)
                 .map(UserBoundary::new)
@@ -44,9 +50,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<UserBoundary> login(String userSuperApp, String userEmail) {
-        UserId userId = new UserId(userSuperApp, userEmail);
-        return userRepository.findById(userId)
-                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))))
+        UserId boundaryUserId = new UserId(userSuperApp, userEmail);
+        return userRepository.findById(boundaryUserId)
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", boundaryUserId))))
                 .map(UserBoundary::new)
                 .doOnNext(userBoundary -> logger.info("User logged in: {}", userBoundary))
                 .log();
@@ -54,21 +60,55 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<Void> updateUserDetails(String userSuperApp, String userEmail, UserBoundary userToUpdate) {
-        UserId userId = new UserId(userSuperApp, userEmail);
+        UserId boundaryUserId = new UserId(userSuperApp, userEmail);
 
-        return userRepository.findById(userId)
-                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))))
+        return userRepository.findById(boundaryUserId)
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", boundaryUserId))))
                 .flatMap(userEntity -> updateUserEntity(userEntity, userToUpdate))
                 .flatMap(userRepository::save)
-                .doOnSuccess(unused -> logger.info("User details updated for userId: {}", userId))
+                .doOnSuccess(unused -> logger.info("User details updated for userId: {}", boundaryUserId))
                 .log()
                 .then();
     }
 
     private Mono<UserEntity> updateUserEntity(UserEntity userEntity, UserBoundary userToUpdate) {
-        userEntity.setAvatar(userToUpdate.getAvatar());
-        userEntity.setUserName(userToUpdate.getUserName());
-        return Mono.just(userEntity);
+        if(userToUpdate.getAvatar() != null){
+            userEntity.setAvatar(userToUpdate.getAvatar());
+        }
+        if(userToUpdate.getUsername() != null){
+            userEntity.setUserName(userToUpdate.getUsername());
+        }
+        return Mono.just(userEntity).log();
     }
 
+    private void validateUser(NewUserBoundary userBoundary) {
+        if (!isValidEmail(userBoundary.getEmail())) {
+            throw new IllegalArgumentException(userBoundary.getEmail() + " is invalid email address");
+        }
+        if (isNullOrEmpty(userBoundary.getUsername())) {
+            throw new  IllegalArgumentException("Username must be provided and not be empty");
+        }
+        if (!isValidUserRole(userBoundary.getRole())) {
+            throw new IllegalArgumentException(userBoundary.getRole() + " is invalid user role");
+        }
+        if(isNullOrEmpty(userBoundary.getAvatar())){
+            throw new IllegalArgumentException("Avatar must be provided and not be empty");
+        }
+
+    }
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
+        }
+        return pattern.matcher(email).matches();
+    }
+
+
+
+
+    private boolean isValidUserRole(String role) {
+        return Arrays.asList("MINIAPP_USER", "SUPERAPP_USER", "ADMIN").contains(role);
+    }
 }

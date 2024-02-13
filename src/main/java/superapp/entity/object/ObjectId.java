@@ -1,4 +1,4 @@
-package superapp.entity.common;
+package superapp.entity.object;
 
 import org.springframework.data.annotation.Id;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class ObjectId implements Serializable {
 	private String superapp;
-	// Serializalbe?
+
 	@Id
     private String id;
 	

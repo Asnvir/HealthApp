@@ -47,8 +47,8 @@ public class UserEntity {
         return role;
     }
 
-    public void setUserId(UserId userId) {
-        this.userId = userId;
+    public void setUserId(UserId boundaryUserId) {
+        this.userId = boundaryUserId;
     }
 
     public void setUserName(String userName) {

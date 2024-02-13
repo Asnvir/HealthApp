@@ -3,7 +3,6 @@ package superapp.entity.object;
 import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import superapp.entity.common.ObjectId;
 
 
 @Document(collection = "OBJECTS")

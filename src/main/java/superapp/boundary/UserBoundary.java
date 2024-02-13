@@ -1,34 +1,36 @@
 package superapp.boundary;
 
-import superapp.entity.user.UserRole;
-import superapp.entity.user.UserEntity;
 import superapp.entity.user.UserId;
+import superapp.entity.user.UserEntity;
 
 public class UserBoundary {
     private UserId userId;
-    private UserRole role;
-    private String userName;
+    private String role;
+    private String username;
     private String avatar;
 
     private UserBoundary(Builder builder) {
         this.userId = builder.userId;
         this.role = builder.role;
-        this.userName = builder.userName;
+        this.username = builder.userName;
         this.avatar = builder.avatar;
     }
 
     public UserBoundary(UserEntity entity) {
         this.userId = entity.getUserId();
-        this.role = entity.getRole();
-        this.userName = entity.getUserName();
+        this.role = entity.getRole().toString();
+        this.username = entity.getUserName();
         this.avatar = entity.getAvatar();
     }
 
-    public UserBoundary(UserId userId, UserRole role, String userName, String avatar) {
+    public UserBoundary(UserId userId, String role, String username, String avatar) {
         this.userId = userId;
         this.role = role;
-        this.userName = userName;
+        this.username = username;
         this.avatar = avatar;
+    }
+
+    public UserBoundary() {
     }
 
 
@@ -36,35 +38,42 @@ public class UserBoundary {
         return userId;
     }
 
-    public UserRole getRole() {
+    public void setUserId(UserId boundaryUserId) {
+        this.userId = boundaryUserId;
+    }
+
+    public String getRole() {
         return role;
     }
 
-    public String getUserName() {
-        return userName;
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getAvatar() {
         return avatar;
     }
 
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
 
     public UserEntity toEntity(String applicationName) {
         return new UserEntity.Builder()
-                .withUserId(new UserId(applicationName, userName))
-                .withUserName(userName)
+                .withUserId(new UserId(applicationName, username))
+                .withUserName(username)
                 .withAvatar(avatar)
                 .build();
     }
-
-//    public static UserBoundary fromEntity(UserEntity userEntity) {
-//        UserId userId = userEntity.getUserId();
-//        UserRole role = userEntity.getRole();
-//        String userName = userEntity.getUserName();
-//        String avatar = userEntity.getAvatar();
-//
-//        return new UserBoundary(userId, role, userName, avatar);
-//    }
 
 
     @Override
@@ -72,7 +81,7 @@ public class UserBoundary {
         return "UserBoundary{" +
                 "userId=" + userId +
                 ", role=" + role +
-                ", username='" + userName + '\'' +
+                ", username='" + username + '\'' +
                 ", avatar='" + avatar + '\'' +
                 '}';
     }
@@ -80,19 +89,19 @@ public class UserBoundary {
 
     public static class Builder {
         private UserId userId;
-        private UserRole role;
+        private String role;
         private String userName;
         private String avatar;
 
         public Builder() {
         }
 
-        public Builder withUserId(UserId userId) {
-            this.userId = userId;
+        public Builder withUserId(UserId boundaryUserId) {
+            this.userId = boundaryUserId;
             return this;
         }
 
-        public Builder withRole(UserRole role) {
+        public Builder withRole(String role) {
             this.role = role;
             return this;
         }

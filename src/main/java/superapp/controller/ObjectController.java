@@ -1,6 +1,7 @@
 package superapp.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import org.springframework.http.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,22 +22,22 @@ import superapp.service.impl.ObjectServiceImpl;
 
 
 @RestController
-@RequestMapping(path = "/objects")
+@RequestMapping(path = "${apiPrefix}/objects")
 public class ObjectController {
-	private static final Logger logger = LoggerFactory.getLogger(ObjectServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ObjectServiceImpl.class);
     @Autowired
     private ObjectService objectService;
 
-    
-	public ObjectController(ObjectService objectService) {
-		this.objectService = objectService;
-	}
-	
+
+    public ObjectController(ObjectService objectService) {
+        this.objectService = objectService;
+    }
+
     @PostMapping(
-		produces = APPLICATION_JSON_VALUE,
-		consumes = APPLICATION_JSON_VALUE)
+            produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE)
     public Mono<ObjectBoundary> create(
-    		@RequestBody ObjectBoundary object) {
+            @RequestBody ObjectBoundary object) {
         logger.info("Received a request to create a object {}", object);
         return this.objectService.create(object);
     }
@@ -48,7 +49,7 @@ public class ObjectController {
 
         return objectService.get(superApp, id);
     }
-    
+
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ObjectBoundary> getAll() {
         logger.info("In controller getAll method");
@@ -57,13 +58,13 @@ public class ObjectController {
     }
 
     @PutMapping(
-		path = "/{superapp}/{id}",
-		consumes = APPLICATION_JSON_VALUE)
+            path = "/{superapp}/{id}",
+            consumes = APPLICATION_JSON_VALUE)
     public Mono<Void> updateObject(@PathVariable("superapp") String superApp,
-                                        @PathVariable("id") String id,
-                                        @RequestBody ObjectBoundary objectToUpdate) {
-    	logger.info("In controller updateObject method - superApp: {}, ID: {}, userToUpdate: {}"
-                ,superApp,id, objectToUpdate);
+                                   @PathVariable("id") String id,
+                                   @RequestBody ObjectBoundary objectToUpdate) {
+        logger.info("In controller updateObject method - superApp: {}, ID: {}, userToUpdate: {}"
+                , superApp, id, objectToUpdate);
         return objectService.update(superApp, objectToUpdate, id);
     }
 }

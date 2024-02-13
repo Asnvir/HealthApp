@@ -13,11 +13,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.ObjectBoundary;
 import superapp.entity.object.ObjectEntity;
-import superapp.entity.common.ObjectId;
+import superapp.entity.object.ObjectId;
 import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
 import superapp.service.ObjectService;
 
+import static ch.qos.logback.core.util.OptionHelper.isNullOrEmpty;
 import static superapp.common.Consts.APPLICATION_NAME;
 
 @Service
@@ -35,6 +36,8 @@ public class ObjectServiceImpl implements ObjectService {
 
 	@Override
 	public Mono<ObjectBoundary> create(ObjectBoundary object) {
+		logger.info("Creating object {}", object);
+		validateObject(object);
 		object.setObjectId(new ObjectId(environment.getProperty(APPLICATION_NAME), UUID.randomUUID().toString()));
 		object.setCreationTimestamp(new Date());
 		return this.objectRep
@@ -46,6 +49,7 @@ public class ObjectServiceImpl implements ObjectService {
 	@Override
 	public Mono<Void> update(String superApp, ObjectBoundary objectToUpdate, String id) {
 		ObjectId objectId = new ObjectId(superApp,id);
+		validateObject(objectToUpdate);
 		return this.objectRep
 				.findById(objectId)
 				.switchIfEmpty(Mono.error(new NotFoundException(String.format("Object with %s not found", objectId))))
@@ -62,7 +66,7 @@ public class ObjectServiceImpl implements ObjectService {
 	        objectEntity.setObjectDetails(objectToUpdate.getObjectDetails());
 	        objectEntity.setAlias(objectToUpdate.getAlias());
 	        objectEntity.setActive(objectToUpdate.getActive());
-	        return Mono.just(objectEntity);
+	        return Mono.just(objectEntity).log();
 	    }
 
 	@Override
@@ -78,5 +82,14 @@ public class ObjectServiceImpl implements ObjectService {
 		return this.objectRep.findAll()
 				.map(ObjectBoundary::new)
 				.log();
+	}
+
+	private void validateObject(ObjectBoundary objectBoundary) {
+		if(!isNullOrEmpty(objectBoundary.getType())) {
+			throw new IllegalArgumentException("Object type is required");
+		}
+		if(!isNullOrEmpty(objectBoundary.getAlias())) {
+			throw new IllegalArgumentException("Object alias is required");
+		}
 	}
 }

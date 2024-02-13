@@ -6,5 +6,5 @@ import superapp.boundary.MiniAppCommandBoundary;
 
 public interface MiniAppCommandService {
 
-	Mono<MiniAppCommandBoundary> invokeACommand(String miniAppName,MiniAppCommandBoundary command);
+	Mono<MiniAppCommandBoundary> invokeACommand(String miniAppName, MiniAppCommandBoundary command);
 }

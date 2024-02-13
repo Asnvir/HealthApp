@@ -17,28 +17,29 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class MiniAppCommandImpl implements MiniAppCommandService {
+public class MiniAppCommandServiceImpl implements MiniAppCommandService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MiniAppCommandImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MiniAppCommandServiceImpl.class);
     @Autowired
     private MiniAppCommandsRepository miniAppCommandsRepository;
     @Autowired
     private Environment environment;
 
-    public MiniAppCommandImpl(MiniAppCommandsRepository miniAppRepo) {
+    public MiniAppCommandServiceImpl(MiniAppCommandsRepository miniAppRepo) {
         super();
         this.miniAppCommandsRepository = miniAppRepo;
     }
 
     @Override
     public Mono<MiniAppCommandBoundary> invokeACommand(String miniAppName,MiniAppCommandBoundary command) {
+        String id = UUID.randomUUID().toString();
         logger.info("Invoking a miniApp command {}", command);
         command.setInvocationTimestamp(new Date()); // Create new date
         command.getInvokedBy().getUserId().setSuperapp(environment.getProperty(APPLICATION_NAME)); // update superapp name
         command.getInvokedBy().getUserId().setEmail(command.getInvokedBy().getUserId().getEmail()); // get main from user
         command.getTargetObject().getObjectId().setSuperapp(environment.getProperty(APPLICATION_NAME));
         command.getTargetObject().getObjectId().setId(UUID.randomUUID().toString());
-        MiniAppCommandEntity miniAppCommandEntity = command.toEntity(environment.getProperty(APPLICATION_NAME),miniAppName);
+        MiniAppCommandEntity miniAppCommandEntity = command.toEntity(environment.getProperty(APPLICATION_NAME),miniAppName,id);
         return miniAppCommandsRepository.save(miniAppCommandEntity)
         		.map(MiniAppCommandEntity::toBoundary)
                 .doOnNext(miniAppBoundary -> logger.info("MiniAppCommand created: {}", miniAppBoundary))

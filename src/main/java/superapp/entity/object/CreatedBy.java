@@ -18,7 +18,7 @@ public class CreatedBy {
 		return userId;
 	}
 
-	public void setUserId(UserId userId) {
+	public void setUserId(UserId boundaryUserId) {
 		this.userId = userId;
 	}
 

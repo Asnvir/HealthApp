@@ -5,15 +5,15 @@ import java.util.Date;
 import superapp.entity.object.CreatedBy;
 import superapp.entity.object.ObjectDetails;
 import superapp.entity.object.ObjectEntity;
-import superapp.entity.common.ObjectId;
+import superapp.entity.object.ObjectId;
 
 public class ObjectBoundary {
     private ObjectId objectId;
     private String type;
     private String alias;
     private Boolean active;
-    private CreatedBy createdBy;
     private Date creationTimestamp;
+    private CreatedBy createdBy;
     private ObjectDetails objectDetails;
 
     public ObjectBoundary() {
