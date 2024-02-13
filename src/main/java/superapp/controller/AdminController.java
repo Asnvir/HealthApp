@@ -30,28 +30,50 @@ public class AdminController {
     }
 
     @DeleteMapping("/users")
-    public Mono<Void> deleteAllUsers((@RequestParam("userSuperapp") String superApp,
+    public Mono<Void> deleteAllUsers(@RequestParam("userSuperapp") String superApp,
                                      @RequestParam("userEmail") String email
                                      ) {
         logger.info("Deleting all users in AdminController");
-        UserId userId = new UserId(superApp, email);
-        return adminService.deleteAllUsers()
-                .doOnSuccess(success -> logger.info("All users deleted successfully"))
-                .doOnError(error -> logger.error("Error deleting users: {}", error.getMessage()));
+        return isAdmin(superApp, email)
+                .flatMap(isAdmin -> {
+                    if (isAdmin) {
+                        return adminService.deleteAllUsers()
+                                .doOnSuccess(success -> logger.info("All users deleted successfully"))
+                                .doOnError(error -> logger.error("Error deleting users: {}", error.getMessage()));
+                    } else {
+                        return Mono.error(new IllegalAccessException("User does not have admin rights"));
+                    }
+                });
     }
 
     @DeleteMapping("/objects")
-    public Mono<Void> deleteAllObjects() {
-        return adminService.deleteAllObjects()
-                .doOnSuccess(success -> logger.info("All objects in MiniApp deleted successfully"))
-                .doOnError(error -> logger.error("Error deleting objects in MiniApp: {}", error.getMessage()));
+    public Mono<Void> deleteAllObjects(@RequestParam("userSuperapp") String superApp,
+                                       @RequestParam("userEmail") String email) {
+        return isAdmin(superApp, email)
+                .flatMap(isAdmin -> {
+                    if (isAdmin) {
+                        return adminService.deleteAllObjects()
+                                .doOnSuccess(success -> logger.info("All objects in MiniApp deleted successfully"))
+                                .doOnError(error -> logger.error("Error deleting objects in MiniApp: {}", error.getMessage()));
+                    } else {
+                        return Mono.error(new IllegalAccessException("User does not have admin rights"));
+                    }
+                });
     }
 
     @DeleteMapping("/miniapp")
-    public Mono<Void> deleteAllCommandsHistory() {
-        return adminService.deleteAllCommandsHistory()
-                .doOnSuccess(success -> logger.info("All commands history deleted successfully"))
-                .doOnError(error -> logger.error("Error deleting commands history: {}", error.getMessage()));
+    public Mono<Void> deleteAllCommandsHistory(@RequestParam("userSuperapp") String superApp,
+                                               @RequestParam("userEmail") String email) {
+        return isAdmin(superApp, email)
+                .flatMap(isAdmin -> {
+                    if (isAdmin) {
+                        return adminService.deleteAllCommandsHistory()
+                                .doOnSuccess(success -> logger.info("All commands history deleted successfully"))
+                                .doOnError(error -> logger.error("Error deleting commands history: {}", error.getMessage()));
+                    } else {
+                        return Mono.error(new IllegalAccessException("User does not have admin rights"));
+                    }
+                });
     }
 
     @GetMapping("/users")
