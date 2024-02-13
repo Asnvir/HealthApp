@@ -50,9 +50,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<UserBoundary> login(String userSuperApp, String userEmail) {
-        UserId boundaryUserId = new UserId(userSuperApp, userEmail);
-        return userRepository.findById(boundaryUserId)
-                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", boundaryUserId))))
+        UserId userId = new UserId(userSuperApp, userEmail);
+        return userRepository.findById(userId)
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))))
                 .map(UserBoundary::new)
                 .doOnNext(userBoundary -> logger.info("User logged in: {}", userBoundary))
                 .log();
@@ -60,15 +60,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<Void> updateUserDetails(String userSuperApp, String userEmail, UserBoundary userToUpdate) {
-        UserId boundaryUserId = new UserId(userSuperApp, userEmail);
+        UserId userId = new UserId(userSuperApp, userEmail);
 
-        return userRepository.findById(boundaryUserId)
-                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", boundaryUserId))))
+        return userRepository.findById(userId)
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))))
                 .flatMap(userEntity -> updateUserEntity(userEntity, userToUpdate))
                 .flatMap(userRepository::save)
-                .doOnSuccess(unused -> logger.info("User details updated for userId: {}", boundaryUserId))
+                .doOnSuccess(unused -> logger.info("User details updated for userId: {}", userId))
                 .log()
                 .then();
+    }
+
+    @Override
+    public Mono<UserBoundary> getUserById(UserId userId) {
+
+        return userRepository.findById(userId)
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))))
+                .map(UserBoundary::new)
+                .doOnNext(userBoundary -> logger.info("User found: {}", userBoundary))
+                .log();
     }
 
     private Mono<UserEntity> updateUserEntity(UserEntity userEntity, UserBoundary userToUpdate) {

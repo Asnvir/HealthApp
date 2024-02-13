@@ -8,7 +8,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.MiniAppCommandBoundary;
 import superapp.boundary.UserBoundary;
+import superapp.entity.user.UserId;
+import superapp.entity.user.UserRole;
 import superapp.service.AdminService;
+import superapp.service.UserService;
 
 
 @RestController
@@ -18,14 +21,20 @@ public class AdminController {
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     private final AdminService adminService;
+    private final UserService userService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, UserService userService) {
+
         this.adminService = adminService;
+        this.userService = userService;
     }
 
     @DeleteMapping("/users")
-    public Mono<Void> deleteAllUsers() {
+    public Mono<Void> deleteAllUsers((@RequestParam("userSuperapp") String superApp,
+                                     @RequestParam("userEmail") String email
+                                     ) {
         logger.info("Deleting all users in AdminController");
+        UserId userId = new UserId(superApp, email);
         return adminService.deleteAllUsers()
                 .doOnSuccess(success -> logger.info("All users deleted successfully"))
                 .doOnError(error -> logger.error("Error deleting users: {}", error.getMessage()));
@@ -67,6 +76,16 @@ public class AdminController {
                 .doOnNext(command -> logger.info("Exported this miniapp commands history: {}", command))
                 .doOnComplete(() -> logger.info("This miniapp commands history exported successfully"))
                 .doOnError(error -> logger.error("Error exporting this miniapp commands history: {}", error.getMessage()));
+    }
+
+    private Mono<Boolean> isAdmin(String superApp, String email) {
+        UserId userId = new UserId(superApp, email);
+        return userService.getUserById(userId)
+                .map(user -> UserRole.ADMIN.toString().equals(user.getRole()))
+                .onErrorResume(error -> {
+                    logger.error("Error fetching user: {}", error.getMessage());
+                    return Mono.just(false);
+                });
     }
 
 }
