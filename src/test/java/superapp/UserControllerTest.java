@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-import superapp.boundary.NewUserBoundary;
-import superapp.boundary.UserBoundary;
-import superapp.entity.user.UserId;
+import superapp.boundary.user.NewUserBoundary;
+import superapp.boundary.user.UserBoundary;
+import superapp.boundary.user.UserIdBoundary;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -180,7 +180,7 @@ public class UserControllerTest {
 
         String superapp = "2024a.Anna.Telisov";
         String userEmail = "user@example.com";
-        UserBoundary userToUpdate = new UserBoundary(new UserId(superapp, userEmail), "ADMIN", "Jane Doe", "new_avatar_url");
+        UserBoundary userToUpdate = new UserBoundary(new UserIdBoundary(superapp, userEmail), "ADMIN", "Jane Doe", "new_avatar_url");
 
         NewUserBoundary user = new NewUserBoundary(userEmail, "ADMIN", "John Doe", "avatar_url");
 

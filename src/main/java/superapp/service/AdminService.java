@@ -2,16 +2,16 @@ package superapp.service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import superapp.boundary.MiniAppCommandBoundary;
-import superapp.boundary.UserBoundary;
+import superapp.boundary.command.MiniAppCommandBoundary;
+import superapp.boundary.user.UserBoundary;
 
 public interface AdminService {
-    Mono<Void> deleteAllUsers();
-    Mono<Void> deleteAllObjects();
-    Mono<Void> deleteAllCommandsHistory();
-    Flux<UserBoundary> exportAllUsers();
-    Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory();
-    Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(String miniAppName);
+    Mono<Void> deleteAllUsers(String superApp, String email);
+    Mono<Void> deleteAllObjects(String superApp, String email);
+    Mono<Void> deleteAllCommandsHistory(String superApp, String email);
+    Flux<UserBoundary> exportAllUsers(String superApp, String email);
+    Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory(String superApp, String email);
+    Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(String miniAppName, String superApp, String email);
 
 
 }

@@ -1,4 +1,4 @@
-package superapp.boundary;
+package superapp.boundary.user;
 
 import superapp.entity.user.UserId;
 import superapp.entity.user.UserRole;

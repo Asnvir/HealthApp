@@ -7,24 +7,25 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
-import superapp.boundary.NewUserBoundary;
-import superapp.boundary.UserBoundary;
-import superapp.entity.user.UserId;
+import superapp.boundary.user.NewUserBoundary;
+import superapp.boundary.user.UserBoundary;
 import superapp.entity.user.UserEntity;
+import superapp.entity.user.UserId;
 import superapp.exception.NotFoundException;
 import superapp.repository.UserRepository;
+import superapp.service.AbstractService;
 import superapp.service.UserService;
+import superapp.utils.Validator;
 
 
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 
 import static ch.qos.logback.core.util.OptionHelper.isNullOrEmpty;
 import static superapp.common.Consts.APPLICATION_NAME;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends AbstractService implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
@@ -103,31 +104,20 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateUser(NewUserBoundary userBoundary) {
-        if (!isValidEmail(userBoundary.getEmail())) {
+        if (!Validator.isValidEmail(userBoundary.getEmail())) {
             throw new IllegalArgumentException(userBoundary.getEmail() + " is invalid email address");
         }
-        if (isNullOrEmpty(userBoundary.getUsername())) {
+        if (Validator.isNullOrEmpty(userBoundary.getUsername())) {
             throw new  IllegalArgumentException("Username must be provided and not be empty");
         }
         if (!isValidUserRole(userBoundary.getRole())) {
             throw new IllegalArgumentException(userBoundary.getRole() + " is invalid user role");
         }
-        if(isNullOrEmpty(userBoundary.getAvatar())){
+        if(Validator.isNullOrEmpty(userBoundary.getAvatar())){
             throw new IllegalArgumentException("Avatar must be provided and not be empty");
         }
 
     }
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        if (email == null) {
-            return false;
-        }
-        return pattern.matcher(email).matches();
-    }
-
-
-
 
     private boolean isValidUserRole(String role) {
         return Arrays.asList("MINIAPP_USER", "SUPERAPP_USER", "ADMIN").contains(role);

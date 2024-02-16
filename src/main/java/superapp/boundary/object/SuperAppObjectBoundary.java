@@ -1,28 +1,29 @@
-package superapp.boundary;
+package superapp.boundary.object;
 
 import java.util.Date;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import superapp.entity.object.CreatedBy;
-import superapp.entity.object.ObjectDetails;
-import superapp.entity.object.ObjectEntity;
-import superapp.entity.object.ObjectId;
 
-public class ObjectBoundary {
-    private ObjectId objectId;
+public class SuperAppObjectBoundary {
+    private SuperAppObjectIdBoundary superAppObjectIdBoundary;
+
+    @JsonProperty("type")
     private String type;
     private String alias;
     private Boolean active;
     private Date creationTimestamp;
     private CreatedBy createdBy;
-    private ObjectDetails objectDetails;
+    private Map<String, Object> objectDetails;
 
-    public ObjectBoundary() {
+    public SuperAppObjectBoundary() {
     }
 
-    public ObjectBoundary(ObjectId objectId, String type, String alias, Boolean active, CreatedBy createdBy,
-                          Date creationTimestamp, ObjectDetails objectDetails) {
+    public SuperAppObjectBoundary(SuperAppObjectIdBoundary objectId, String type, String alias, Boolean active, CreatedBy createdBy,
+                                  Date creationTimestamp,  Map<String, Object> objectDetails) {
         super();
-        this.objectId = objectId;
+        this.superAppObjectIdBoundary = objectId;
         this.type = type;
         this.alias = alias;
         this.active = active;
@@ -31,22 +32,13 @@ public class ObjectBoundary {
         this.objectDetails = objectDetails;
     }
 
-    public ObjectBoundary(ObjectEntity entity) {
-        this.objectId = entity.getObjectId();
-        this.type = entity.getType();
-        this.alias = entity.getAlias();
-        this.active = entity.getActive();
-        this.createdBy = entity.getCreatedBy();
-        this.creationTimestamp = entity.getCreationTimestamp();
-        this.objectDetails = entity.getObjectDetails();
+
+    public SuperAppObjectIdBoundary getObjectId() {
+        return superAppObjectIdBoundary;
     }
 
-    public ObjectId getObjectId() {
-        return objectId;
-    }
-
-    public void setObjectId(ObjectId objectId) {
-        this.objectId = objectId;
+    public void setObjectId(SuperAppObjectIdBoundary objectId) {
+        this.superAppObjectIdBoundary = objectId;
     }
 
     public String getType() {
@@ -89,29 +81,17 @@ public class ObjectBoundary {
         this.creationTimestamp = creationTimestamp;
     }
 
-    public ObjectDetails getObjectDetails() {
+    public Map<String, Object> getObjectDetails() {
         return objectDetails;
     }
 
-    public void setObjectDetails(ObjectDetails objectDetails) {
+    public void setObjectDetails( Map<String, Object> objectDetails) {
         this.objectDetails = objectDetails;
-    }
-
-    public ObjectEntity toEntity() {
-        ObjectEntity entity = new ObjectEntity();
-        entity.setObjectId(this.getObjectId());
-        entity.setType(this.type);
-        entity.setAlias(this.alias);
-        entity.setActive(this.active);
-        entity.setCreatedBy(this.createdBy);
-        entity.setCreationTimestamp(this.creationTimestamp);
-        entity.setObjectDetails(this.objectDetails);
-        return entity;
     }
 
     @Override
     public String toString() {
-        return "ObjectBoundary [objectId=" + objectId
+        return "ObjectBoundary [objectId=" + superAppObjectIdBoundary
                 + ", type=" + type
                 + ", alias=" + alias
                 + ", active=" + active

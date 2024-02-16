@@ -10,74 +10,56 @@ import org.springframework.web.bind.annotation.*;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import superapp.boundary.ObjectBoundary;
-import superapp.entity.user.UserId;
-import superapp.entity.user.UserRole;
-import superapp.service.ObjectService;
-import superapp.service.UserService;
-import superapp.service.impl.ObjectServiceImpl;
+import superapp.boundary.object.SuperAppObjectBoundary;
+import superapp.service.SuperAppObjectService;
+import superapp.service.impl.SuperAppObjectServiceImpl;
 
 
 @RestController
 @RequestMapping(path = "${apiPrefix}/objects")
 public class SuperAppObjectController {
-    private static final Logger logger = LoggerFactory.getLogger(ObjectServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(SuperAppObjectServiceImpl.class);
     @Autowired
-    private ObjectService objectService;
-    @Autowired
-    private UserService userService;
+    private SuperAppObjectService superAppObjectService;
 
 
-    public SuperAppObjectController(ObjectService objectService) {
 
-        this.objectService = objectService;
+    public SuperAppObjectController(SuperAppObjectService superAppObjectService) {
+
+        this.superAppObjectService = superAppObjectService;
 
     }
 
     @PostMapping(
             produces = APPLICATION_JSON_VALUE,
             consumes = APPLICATION_JSON_VALUE)
-    public Mono<ObjectBoundary> create(
-            @RequestBody ObjectBoundary object) {
+    public Mono<SuperAppObjectBoundary> create(
+            @RequestBody SuperAppObjectBoundary object) {
         logger.info("Received a request to create a object {}", object);
-        return this.objectService.create(object);
+        return this.superAppObjectService.create(object)
+                .doOnSuccess(success -> logger.info("Object created successfully"))
+                .doOnError(error -> logger.error("Error creating object"));
     }
 
     @GetMapping(path = "{superapp}/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ObjectBoundary> get(@PathVariable("superapp") String superApp,
-                                    @PathVariable("id") String id,
-                                    @RequestParam("userSuperapp") String userSuperapp,
-                                    @RequestParam("userEmail") String email
-                                    ) {
+    public Mono<SuperAppObjectBoundary> get(@PathVariable("superapp") String superApp,
+                                            @PathVariable("id") String id,
+                                            @RequestParam("userSuperapp") String userSuperapp,
+                                            @RequestParam("userEmail") String email) {
         logger.info("In controller get method - superApp: {} and ID: {}", superApp, id);
-
-        return isSuperAppUser(userSuperapp,email)
-                .flatMap(isSuperAppUser -> {
-                    if (isSuperAppUser) {
-                        return objectService.get(superApp, id)
+                        return superAppObjectService.get(superApp, id, userSuperapp, email)
                                 .doOnSuccess(success -> logger.info("Object details fetched successfully for userId: {}", id))
                                 .doOnError(error -> logger.error("Error fetching object details for userId: {}", id));
-                    } else {
-                        return Mono.error(new IllegalAccessException("User does not have superapp rights"));
-                    }
-                });
+
     }
 
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ObjectBoundary> getAll(@RequestParam("userSuperapp") String userSuperapp,
-                                       @RequestParam("userEmail") String email) {
+    public Flux<SuperAppObjectBoundary> getAll(@RequestParam("userSuperapp") String userSuperapp,
+                                               @RequestParam("userEmail") String email) {
         logger.info("In controller getAll method");
-
-        return isSuperAppUser(userSuperapp, email)
-                .flatMapMany(hasAccess -> {
-                    if (hasAccess) {
-                        return objectService.getAll()
+                        return superAppObjectService.getAll(userSuperapp, email)
                                 .doOnNext(success -> logger.info("Objects fetched successfully"))
                                 .doOnError(error -> logger.error("Error fetching objects"));
-                    } else {
-                        return Flux.error(new IllegalAccessException("User does not have superapp rights"));
-                    }
-                });
     }
 
     @PutMapping(
@@ -85,55 +67,41 @@ public class SuperAppObjectController {
             consumes = APPLICATION_JSON_VALUE)
     public Mono<Void> updateObject(@PathVariable("superapp") String superApp,
                                    @PathVariable("id") String id,
-                                   @RequestBody ObjectBoundary objectToUpdate) {
+                                   @RequestBody SuperAppObjectBoundary objectToUpdate,
+                                   @RequestParam String userSuperapp,
+                                      @RequestParam String userEmail
+    ) {
         logger.info("In controller updateObject method - superApp: {}, ID: {}, userToUpdate: {}"
                 , superApp, id, objectToUpdate);
-        return objectService.update(superApp, objectToUpdate, id);
+        return superAppObjectService.update(superApp, objectToUpdate, id, userSuperapp, userEmail)
+                .doOnSuccess(success -> logger.info("Object updated successfully for userId: {}", id))
+                .doOnError(error -> logger.error("Error updating object for userId: {}", id));
     }
 
     @GetMapping("/search/byType/{type}")
-    public Flux<ObjectBoundary> getObjectsByType(@PathVariable("type") String type,
-                                                 @RequestParam("userSuperapp") String superApp,
-                                                 @RequestParam("userEmail") String email
+    public Flux<SuperAppObjectBoundary> getObjectsByType(@PathVariable("type") String type,
+                                                         @RequestParam("userSuperapp") String superApp,
+                                                         @RequestParam("userEmail") String email
     ) {
-        return isSuperAppUser(superApp,email)
-                .flatMapMany(hasAccess -> {
-                    if (hasAccess) {
-                        return objectService.getObjectsByType(type)
+
+                        return superAppObjectService.getObjectsByType(type, superApp, email)
                                 .doOnNext(success -> logger.info("Objects fetched successfully for type: {}", type))
                                 .doOnError(error -> logger.error("Error fetching objects for type: {}", type));
-                    } else {
-                        return Flux.error(new IllegalAccessException("User does not have superapp rights"));
-                    }
-                });
+
     }
 
     @GetMapping("/search/byAlias/{alias}")
-    public Flux<ObjectBoundary> getObjectsByAlias(@PathVariable("alias") String alias,
-                                                 @RequestParam("userSuperapp") String superApp,
-                                                 @RequestParam("userEmail") String email
+    public Flux<SuperAppObjectBoundary> getObjectsByAlias(@PathVariable("alias") String alias,
+                                                          @RequestParam("userSuperapp") String superApp,
+                                                          @RequestParam("userEmail") String email
     ) {
-        return isSuperAppUser(superApp,email)
-                .flatMapMany(hasAccess -> {
-                    if (hasAccess) {
-                        return objectService.getObjectsByAlias(alias)
+
+                        return superAppObjectService.getObjectsByAlias(alias, superApp, email)
                                 .doOnNext(success -> logger.info("Objects fetched successfully for alias: {}", alias))
                                 .doOnError(error -> logger.error("Error fetching objects for alias: {}", alias));
-                    } else {
-                        return Flux.error(new IllegalAccessException("User does not have superapp rights"));
-                    }
-                });
+
 
     }
 
-    private Mono<Boolean> isSuperAppUser(String superApp, String email) {
-        UserId userId = new UserId(superApp, email);
-        return userService.getUserById(userId)
-                .map(user -> UserRole.SUPERAPP_USER.toString().equals(user.getRole()))
-                .onErrorResume(error -> {
-                    logger.error("Error fetching user: {}", error.getMessage());
-                    return Mono.just(false);
-                });
-    }
 }
 

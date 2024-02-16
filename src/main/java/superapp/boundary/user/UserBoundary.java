@@ -1,10 +1,10 @@
-package superapp.boundary;
+package superapp.boundary.user;
 
 import superapp.entity.user.UserId;
 import superapp.entity.user.UserEntity;
 
 public class UserBoundary {
-    private UserId userId;
+    private UserIdBoundary userId;
     private String role;
     private String username;
     private String avatar;
@@ -17,13 +17,14 @@ public class UserBoundary {
     }
 
     public UserBoundary(UserEntity entity) {
-        this.userId = entity.getUserId();
+        UserIdBoundary userId = new UserIdBoundary(entity.getUserId().getSuperapp(), entity.getUserId().getEmail());
+        this.userId = userId;
         this.role = entity.getRole().toString();
         this.username = entity.getUserName();
         this.avatar = entity.getAvatar();
     }
 
-    public UserBoundary(UserId userId, String role, String username, String avatar) {
+    public UserBoundary(UserIdBoundary userId, String role, String username, String avatar) {
         this.userId = userId;
         this.role = role;
         this.username = username;
@@ -34,11 +35,11 @@ public class UserBoundary {
     }
 
 
-    public UserId getUserId() {
+    public UserIdBoundary getUserId() {
         return userId;
     }
 
-    public void setUserId(UserId boundaryUserId) {
+    public void setUserId(UserIdBoundary boundaryUserId) {
         this.userId = boundaryUserId;
     }
 
@@ -88,7 +89,7 @@ public class UserBoundary {
 
 
     public static class Builder {
-        private UserId userId;
+        private UserIdBoundary userId;
         private String role;
         private String userName;
         private String avatar;
@@ -96,7 +97,7 @@ public class UserBoundary {
         public Builder() {
         }
 
-        public Builder withUserId(UserId boundaryUserId) {
+        public Builder withUserId(UserIdBoundary boundaryUserId) {
             this.userId = boundaryUserId;
             return this;
         }

@@ -22,7 +22,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalAccessException.class)
     public Mono<ResponseEntity<String>> handleIllegalAccessException(IllegalAccessException ex) {
-        // Log the exception details if necessary
         return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied: " + ex.getMessage()));
     }
 }

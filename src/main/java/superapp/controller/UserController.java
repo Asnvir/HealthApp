@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import superapp.boundary.NewUserBoundary;
-import superapp.boundary.UserBoundary;
+import superapp.boundary.user.NewUserBoundary;
+import superapp.boundary.user.UserBoundary;
 import superapp.service.UserService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;

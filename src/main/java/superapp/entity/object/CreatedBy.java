@@ -1,5 +1,6 @@
 package superapp.entity.object;
 
+
 import superapp.entity.user.UserId;
 
 public class CreatedBy {
@@ -18,7 +19,7 @@ public class CreatedBy {
 		return userId;
 	}
 
-	public void setUserId(UserId boundaryUserId) {
+	public void setUserId(UserId userId) {
 		this.userId = userId;
 	}
 

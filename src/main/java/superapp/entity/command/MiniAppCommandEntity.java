@@ -4,11 +4,13 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+
 import org.springframework.data.mongodb.core.mapping.Document;
-import superapp.boundary.MiniAppCommandBoundary;
+import superapp.boundary.command.MiniAppCommandBoundary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
+import superapp.boundary.command.MiniAppCommandIdBoundary;
 
 @Document(collection = "MINIAPPSCOMMANDS")
 public class MiniAppCommandEntity {
@@ -102,6 +104,8 @@ public class MiniAppCommandEntity {
 
     public MiniAppCommandBoundary toBoundary() {
         MiniAppCommandBoundary newBound = new MiniAppCommandBoundary();
+        MiniAppCommandIdBoundary commandId = new MiniAppCommandIdBoundary(this.getCommandId().getSuperapp(), this.getCommandId().getMiniApp(), this.getCommandId().getId());
+        newBound.setCommandId(commandId);
         newBound.setCommand(command);
         newBound.setTargetObject(targetObject);
         newBound.setInvocationTimestamp(invocationTimestamp);

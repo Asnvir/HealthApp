@@ -1,4 +1,4 @@
-package superapp.boundary;
+package superapp.boundary.command;
 
 import java.util.Date;
 import java.util.Map;
@@ -10,7 +10,7 @@ import superapp.entity.command.MiniAppCommandEntity;
 import superapp.entity.command.CommandId;
 
 public class MiniAppCommandBoundary {
-    private CommandId commandId;
+    private MiniAppCommandIdBoundary commandId;
     private String command;
     private TargetObject targetObject;
     private Date invocationTimestamp;
@@ -22,7 +22,8 @@ public class MiniAppCommandBoundary {
     }
 
     public MiniAppCommandBoundary(MiniAppCommandEntity entity) {
-        this.commandId = entity.getCommandId();
+        this.commandId = new MiniAppCommandIdBoundary(entity.getCommandId().getSuperapp(),
+                entity.getCommandId().getMiniApp(), entity.getCommandId().getId());
         this.command = entity.getCommand();
         this.targetObject = entity.getTargetObject();
         this.invocationTimestamp = entity.getInvocationTimestamp();
@@ -40,11 +41,11 @@ public class MiniAppCommandBoundary {
         this.commandAttributes = commandAttributes;
     }
 
-    public CommandId getCommandId() {
+    public MiniAppCommandIdBoundary getCommandId() {
         return commandId;
     }
 
-    public void setCommandId(CommandId commandId) {
+    public void setCommandId(MiniAppCommandIdBoundary commandId) {
         this.commandId = commandId;
     }
 

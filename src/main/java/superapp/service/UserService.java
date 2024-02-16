@@ -1,9 +1,10 @@
 package superapp.service;
 
 import reactor.core.publisher.Mono;
-import superapp.boundary.NewUserBoundary;
-import superapp.boundary.UserBoundary;
+import superapp.boundary.user.NewUserBoundary;
+import superapp.boundary.user.UserBoundary;
 import superapp.entity.user.UserId;
+
 
 public interface UserService {
     Mono<UserBoundary> create(NewUserBoundary user);

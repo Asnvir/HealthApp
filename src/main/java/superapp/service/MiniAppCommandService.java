@@ -1,7 +1,7 @@
 package superapp.service;
 
 import reactor.core.publisher.Mono;
-import superapp.boundary.MiniAppCommandBoundary;
+import superapp.boundary.command.MiniAppCommandBoundary;
 
 
 public interface MiniAppCommandService {

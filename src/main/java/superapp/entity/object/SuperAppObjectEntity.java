@@ -6,14 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @Document(collection = "OBJECTS")
-public class ObjectEntity {
+public class SuperAppObjectEntity {
 @Id private ObjectId objectId;
 	private String type;
     private String alias;
     private Boolean active;
     private CreatedBy createdBy;
     private Date creationTimestamp;
-    private ObjectDetails objectDetails;
+    private String objectDetails;
     
 	public ObjectId getObjectId() {
 		return objectId;
@@ -51,10 +51,10 @@ public class ObjectEntity {
 	public void setCreationTimestamp(Date creationTimestamp) {
 		this.creationTimestamp = creationTimestamp;
 	}
-	public ObjectDetails getObjectDetails() {
+	public String getObjectDetails() {
 		return objectDetails;
 	}
-	public void setObjectDetails(ObjectDetails objectDetails) {
+	public void setObjectDetails(String objectDetails) {
 		this.objectDetails = objectDetails;
 	}
 	@Override
