@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import superapp.boundary.MiniAppCommandBoundary;
+import superapp.entity.user.UserId;
+import superapp.entity.user.UserRole;
 import superapp.service.MiniAppCommandService;
+import superapp.service.UserService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -26,4 +29,5 @@ public class MiniAppCommandsController {
         logger.info("Received a request to invoke a new command {}", newMiniAppCommand);
         return miniAppCommandService.invokeACommand(miniAppName, newMiniAppCommand);
     }
+
 }

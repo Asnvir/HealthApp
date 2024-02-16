@@ -81,6 +81,17 @@ public class UserServiceImpl implements UserService {
                 .log();
     }
 
+    @Override
+    public Mono<Void> deleteUser(String superApp, String userEmail) {
+        UserId userId = new UserId(superApp, userEmail);
+        return userRepository.findById(userId)
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))))
+                .flatMap(userRepository::delete)
+                .doOnSuccess(unused -> logger.info("User deleted: {}", userId))
+                .log()
+                .then();
+    }
+
     private Mono<UserEntity> updateUserEntity(UserEntity userEntity, UserBoundary userToUpdate) {
         if(userToUpdate.getAvatar() != null){
             userEntity.setAvatar(userToUpdate.getAvatar());

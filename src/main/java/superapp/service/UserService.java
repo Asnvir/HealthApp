@@ -13,4 +13,6 @@ public interface UserService {
     Mono<Void> updateUserDetails(String userSuperApp, String userEmail, UserBoundary userToUpdate);
 
     Mono<UserBoundary> getUserById(UserId userId);
+
+    Mono<Void> deleteUser(String superApp, String userEmail);
 }

@@ -84,6 +84,21 @@ public class ObjectServiceImpl implements ObjectService {
 				.log();
 	}
 
+	@Override
+	public Flux<ObjectBoundary> getObjectsByType(String type) {
+		return this.objectRep.findByType(type)
+				.map(ObjectBoundary::new)
+				.log();
+	}
+
+	@Override
+	public Flux<ObjectBoundary> getObjectsByAlias(String alias) {
+		return this.objectRep.findByAlias(alias)
+				.map(ObjectBoundary::new)
+				.log();
+	}
+
+
 	private void validateObject(ObjectBoundary objectBoundary) {
 		if(!isNullOrEmpty(objectBoundary.getType())) {
 			throw new IllegalArgumentException("Object type is required");

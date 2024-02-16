@@ -49,6 +49,7 @@ public class AdminController {
     @DeleteMapping("/objects")
     public Mono<Void> deleteAllObjects(@RequestParam("userSuperapp") String superApp,
                                        @RequestParam("userEmail") String email) {
+        logger.info("Deleting all objects in AdminController");
         return isAdmin(superApp, email)
                 .flatMap(isAdmin -> {
                     if (isAdmin) {
@@ -64,6 +65,7 @@ public class AdminController {
     @DeleteMapping("/miniapp")
     public Mono<Void> deleteAllCommandsHistory(@RequestParam("userSuperapp") String superApp,
                                                @RequestParam("userEmail") String email) {
+        logger.info("Deleting all commands history in AdminController");
         return isAdmin(superApp, email)
                 .flatMap(isAdmin -> {
                     if (isAdmin) {

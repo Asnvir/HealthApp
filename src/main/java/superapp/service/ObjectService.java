@@ -9,4 +9,8 @@ public interface ObjectService {
 	Mono<Void> update(String superApp, ObjectBoundary object, String id);
 	Mono<ObjectBoundary> get(String superapp, String id);
 	Flux<ObjectBoundary> getAll();
+
+	Flux<ObjectBoundary> getObjectsByType(String type);
+
+	Flux<ObjectBoundary> getObjectsByAlias(String alias);
 }
