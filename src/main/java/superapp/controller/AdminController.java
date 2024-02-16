@@ -79,27 +79,50 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public Flux<UserBoundary> exportAllUsers() {
-        return adminService.exportAllUsers()
-                .doOnNext(user -> logger.info("Exported user: {}", user))
-                .doOnComplete(() -> logger.info("All users exported successfully"))
-                .doOnError(error -> logger.error("Error exporting users: {}", error.getMessage()));
+    public Flux<UserBoundary> exportAllUsers(@RequestParam("userSuperapp") String superApp,
+                                             @RequestParam("userEmail") String email) {
+        return  isAdmin(superApp, email)
+                .flatMapMany(isAdmin -> {
+                    if (isAdmin) {
+                        return adminService.exportAllUsers()
+                                .doOnNext(user -> logger.info("Exported user: {}", user))
+                                .doOnComplete(() -> logger.info("All users exported successfully"))
+                                .doOnError(error -> logger.error("Error exporting users: {}", error.getMessage()));
+                    } else {
+                        return Flux.error(new IllegalAccessException("User does not have admin rights"));
+                    }
+                });
     }
 
     @GetMapping("/miniapp")
-    public Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory() {
-        return adminService.exportAllMiniAppsCommandsHistory()
-                .doOnNext(command -> logger.info("Exported commands history: {}", command))
-                .doOnComplete(() -> logger.info("All commands history exported successfully"))
-                .doOnError(error -> logger.error("Error exporting commands history: {}", error.getMessage()));
+    public Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory(@RequestParam("userSuperapp") String superApp,
+                                                                         @RequestParam("userEmail") String email) {
+        return  isAdmin(superApp, email)
+                .flatMapMany(isAdmin -> {
+                    if (isAdmin) {
+                        return adminService.exportAllMiniAppsCommandsHistory()
+                                .doOnNext(command -> logger.info("Exported commands history: {}", command))
+                                .doOnComplete(() -> logger.info("All commands history exported successfully"))
+                                .doOnError(error -> logger.error("Error exporting commands history: {}", error.getMessage()));
+                    } else {
+                        return Flux.error(new IllegalAccessException("User does not have admin rights"));
+                    }
+                });
     }
 
     @GetMapping("/miniapp/{miniAppName}")
-    public Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(@PathVariable("miniAppName") String miniAppName) {
-        return adminService.exportMiniAppCommandsHistory(miniAppName)
-                .doOnNext(command -> logger.info("Exported this miniapp commands history: {}", command))
-                .doOnComplete(() -> logger.info("This miniapp commands history exported successfully"))
-                .doOnError(error -> logger.error("Error exporting this miniapp commands history: {}", error.getMessage()));
+    public Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(@PathVariable("miniAppName") String miniAppName,
+                                                                     @RequestParam("userSuperapp") String superApp,
+                                                                     @RequestParam("userEmail") String email
+                                                                     ) {
+        return  isAdmin(superApp, email)
+                .flatMapMany(isAdmin -> {
+                    if (isAdmin) {
+                        return adminService.exportMiniAppCommandsHistory(miniAppName);
+                    } else {
+                        return Flux.error(new IllegalAccessException("User does not have admin rights"));
+                    }
+                });
     }
 
     private Mono<Boolean> isAdmin(String superApp, String email) {
