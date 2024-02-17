@@ -17,11 +17,13 @@ import superapp.entity.object.SuperAppObjectEntity;
 import superapp.entity.object.ObjectId;
 import superapp.entity.user.UserId;
 import superapp.entity.user.UserRole;
+import superapp.exception.InvalidInputException;
 import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
 import superapp.repository.UserRepository;
 import superapp.service.AbstractService;
 import superapp.service.SuperAppObjectService;
+import superapp.utils.EmailChecker;
 import superapp.utils.Validator;
 import static superapp.common.Consts.APPLICATION_NAME;
 import static superapp.exception.Consts.SUPER_APP_PERMISSION_EXCEPTION;
@@ -120,14 +122,15 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
 
     @Override
     public Flux<SuperAppObjectBoundary> getAll(String superapp, String email) {
-        UserId userId = new UserId(superapp, email);
+    	UserId userId = new UserId(superapp, email);
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findAll().map(superAppObjectConverter::toBoundary).log();
         return filterObjectsBasedOnUserRole(userId, objects);
     }
 
     @Override
     public Flux<SuperAppObjectBoundary> getObjectsByType(String type, String superApp, String email) {
-        UserId userId = new UserId(superApp, email);
+    	checkValidationBeforeGetCommands(type,superApp,email);
+    	UserId userId = new UserId(superApp, email);
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findByType(type)
                 .map(superAppObjectConverter::toBoundary)
                 .log();
@@ -137,7 +140,8 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
 
     @Override
     public Flux<SuperAppObjectBoundary> getObjectsByAlias(String alias, String superApp, String email) {
-        UserId userId = new UserId(superApp, email);
+    	checkValidationBeforeGetCommands(alias,superApp,email);
+    	UserId userId = new UserId(superApp, email);
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findByAlias(alias)
                 .map(superAppObjectConverter::toBoundary)
                 .log();
@@ -187,5 +191,24 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
             }
         }
     }
+    
+    private void checkValidationBeforeGetCommands(String type, String superApp, String email) {
+    	if(type == null || superApp == null || email == null)
+    		throw new InvalidInputException("One or more of the inputs are null.");
+    	if(!EmailChecker.isValidEmail(email))
+    		throw new InvalidInputException("Invalid user details.");
+    }
+	
+	@Override
+	public Flux<SuperAppObjectBoundary> findByAliasContaining(String pattern, String superApp, String email) {
+	    checkValidationBeforeGetCommands(pattern, superApp, email);
+	    UserId userId = new UserId(superApp, email);
+	    
+	    Flux<SuperAppObjectBoundary> objects = this.objectRep.findByAliasRegex(".*" + pattern + ".*")
+	            .map(superAppObjectConverter::toBoundary)
+	            .log();
+	    
+	    return filterObjectsBasedOnUserRole(userId, objects);
+	}
 
 }

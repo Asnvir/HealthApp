@@ -13,4 +13,6 @@ public interface SuperAppObjectService {
 	Flux<SuperAppObjectBoundary> getObjectsByType(String type, String superApp, String email);
 
 	Flux<SuperAppObjectBoundary> getObjectsByAlias(String alias, String superApp, String email);
+	
+	Flux<SuperAppObjectBoundary> findByAliasContaining(String pattern, String superApp, String email);
 }

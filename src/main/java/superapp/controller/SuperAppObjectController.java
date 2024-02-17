@@ -102,6 +102,19 @@ public class SuperAppObjectController {
 
 
     }
+    
+    @GetMapping("/search/byAliasPattern/{pattern}")
+    public Flux<SuperAppObjectBoundary> getObjectsByAliasPattern(@PathVariable("pattern") String pattern,
+                                                          @RequestParam("userSuperapp") String superApp,
+                                                          @RequestParam("userEmail") String email
+    ) {
+
+                        return superAppObjectService.findByAliasContaining(pattern, superApp, email)
+                                .doOnNext(success -> logger.info("Objects fetched successfully for alias pattern: {}", pattern))
+                                .doOnError(error -> logger.error("Error fetching objects for alias pattern: {}", pattern));
+
+
+    }
 
 }
 
