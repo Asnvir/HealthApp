@@ -53,6 +53,50 @@ public class AdminServiceImpl extends AbstractService implements AdminService {
     }
 
     @Override
+    public Mono<Void> deleteUser(String superApp, String emailAdmin, String deleteUserEmail) {
+        logger.info("Deleting user in AdminServiceImpl, userId: " + deleteUserEmail);
+        UserId adminId = new UserId(superApp, emailAdmin);
+        return isValidUserCredentials(adminId, UserRole.ADMIN, userRepository)
+                .flatMap(isValid -> {
+                    if (!isValid) {
+                        return Mono.error(new IllegalAccessException(ADMIN_PERMISSION_EXCEPTION));
+                    }
+                    return userRepository.deleteByUserId(new UserId(superApp, deleteUserEmail)).log();
+                });
+    }
+
+    @Override
+    public Mono<UserBoundary> exportUser(String userId, String superApp, String email) {
+        logger.info("Exporting user in AdminServiceImpl, userId: " + userId);
+        UserId adminId = new UserId(superApp, email);
+        return isValidUserCredentials(adminId, UserRole.ADMIN, userRepository)
+                .flatMap(isValid -> {
+                    if (!isValid) {
+                        return Mono.error(new IllegalAccessException(ADMIN_PERMISSION_EXCEPTION));
+                    }
+                    return userRepository
+                            .findByUserId(new UserId(superApp, userId))
+                            .map(UserBoundary::new)
+                            .log();
+                });
+    }
+
+    @Override
+    public Mono<Boolean> hasUsers(String superApp, String email) {
+        logger.info("Checking if there are users in AdminServiceImpl");
+        UserId userId = new UserId(superApp, email);
+        return isValidUserCredentials(userId, UserRole.ADMIN, userRepository)
+                .flatMap(isValid -> {
+                    if (!isValid) {
+                        return Mono.error(new IllegalAccessException(ADMIN_PERMISSION_EXCEPTION));
+                    }
+                    return userRepository.count()
+                            .map(count -> count > 0)
+                            .log();
+                });
+    }
+
+    @Override
     public Mono<Void> deleteAllObjects(String superApp, String email) {
         logger.info("Deleting all objects in AdminServiceImpl");
         UserId userId = new UserId(superApp, email);
@@ -117,4 +161,6 @@ public class AdminServiceImpl extends AbstractService implements AdminService {
                     return miniAppCommandsRepository.findByCommandIdMiniApp(miniAppName).map(MiniAppCommandBoundary::new).log();
                 });
     }
+
+
 }

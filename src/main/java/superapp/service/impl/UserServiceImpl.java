@@ -93,6 +93,8 @@ public class UserServiceImpl extends AbstractService implements UserService {
                 .then();
     }
 
+
+
     private Mono<UserEntity> updateUserEntity(UserEntity userEntity, UserBoundary userToUpdate) {
         if(userToUpdate.getAvatar() != null){
             userEntity.setAvatar(userToUpdate.getAvatar());

@@ -14,4 +14,9 @@ public interface AdminService {
     Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(String miniAppName, String superApp, String email);
 
 
+    Mono<Void> deleteUser(String superApp, String email, String deleteUserEmail);
+
+    Mono<UserBoundary> exportUser(String userId, String superApp, String email);
+
+    Mono<Boolean> hasUsers(String superApp, String email);
 }

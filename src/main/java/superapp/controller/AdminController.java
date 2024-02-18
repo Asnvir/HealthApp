@@ -25,49 +25,54 @@ public class AdminController {
     }
 
     @DeleteMapping("/users")
-    public Mono<Void> deleteAllUsers(@RequestParam("userSuperapp") String superApp,
-                                     @RequestParam("userEmail") String email
-    ) {
+    public Mono<Void> deleteAllUsers(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
         return adminService.deleteAllUsers(superApp, email);
     }
 
+    @DeleteMapping("/users/{deleteUserEmail}")
+    public Mono<Void> deleteUser(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email, @PathVariable("deleteUserEmail") String deleteUserEmail) {
+        return adminService.deleteUser(superApp, email, deleteUserEmail);
+    }
+
     @DeleteMapping("/objects")
-    public Mono<Void> deleteAllObjects(@RequestParam("userSuperapp") String superApp,
-                                       @RequestParam("userEmail") String email) {
-
+    public Mono<Void> deleteAllObjects(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
         return adminService.deleteAllObjects(superApp, email);
-
     }
 
     @DeleteMapping("/miniapp")
-    public Mono<Void> deleteAllCommandsHistory(@RequestParam("userSuperapp") String superApp,
-                                               @RequestParam("userEmail") String email) {
+    public Mono<Void> deleteAllCommandsHistory(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
         logger.info("Deleting all commands history in AdminController");
         return adminService.deleteAllCommandsHistory(superApp, email);
 
     }
 
     @GetMapping("/users")
-    public Flux<UserBoundary> exportAllUsers(@RequestParam("userSuperapp") String superApp,
-                                             @RequestParam("userEmail") String email) {
+    public Flux<UserBoundary> exportAllUsers(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
         return adminService.exportAllUsers(superApp, email);
 
     }
 
+    @GetMapping("/users/{userId}")
+    public Mono<UserBoundary> exportUser(@PathVariable("userId") String userId, @RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
+        return adminService.exportUser(userId, superApp, email);
+
+    }
+
     @GetMapping("/miniapp")
-    public Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory(@RequestParam("userSuperapp") String superApp,
-                                                                         @RequestParam("userEmail") String email) {
+    public Flux<MiniAppCommandBoundary> exportAllMiniAppsCommandsHistory(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
         return adminService.exportAllMiniAppsCommandsHistory(superApp, email);
 
     }
 
     @GetMapping("/miniapp/{miniAppName}")
-    public Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(@PathVariable("miniAppName") String miniAppName,
-                                                                     @RequestParam("userSuperapp") String superApp,
-                                                                     @RequestParam("userEmail") String email
-    ) {
+    public Flux<MiniAppCommandBoundary> exportMiniAppCommandsHistory(@PathVariable("miniAppName") String miniAppName, @RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
         return adminService.exportMiniAppCommandsHistory(miniAppName, superApp, email);
 
+    }
+
+    @GetMapping("/hasUsers")
+    public Mono<Boolean> hasUsers(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
+        return adminService.hasUsers(superApp, email);
     }
 
 }
