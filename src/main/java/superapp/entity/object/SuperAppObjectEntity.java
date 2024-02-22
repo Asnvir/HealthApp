@@ -1,6 +1,8 @@
 package superapp.entity.object;
 
 import java.util.Date;
+import java.util.Map;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,7 +15,7 @@ public class SuperAppObjectEntity {
     private Boolean active;
     private CreatedBy createdBy;
     private Date creationTimestamp;
-    private String objectDetails;
+	private Map<String, Object> objectDetails;
     
 	public ObjectId getObjectId() {
 		return objectId;
@@ -51,10 +53,10 @@ public class SuperAppObjectEntity {
 	public void setCreationTimestamp(Date creationTimestamp) {
 		this.creationTimestamp = creationTimestamp;
 	}
-	public String getObjectDetails() {
+	public Map<String, Object>  getObjectDetails() {
 		return objectDetails;
 	}
-	public void setObjectDetails(String objectDetails) {
+	public void setObjectDetails(Map<String, Object> objectDetails) {
 		this.objectDetails = objectDetails;
 	}
 	@Override

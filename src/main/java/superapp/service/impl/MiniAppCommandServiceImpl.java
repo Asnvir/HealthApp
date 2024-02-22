@@ -14,8 +14,8 @@ import superapp.exception.InvalidInputException;
 import superapp.repository.MiniAppCommandsRepository;
 import superapp.repository.ObjectRepository;
 import superapp.repository.UserRepository;
-import superapp.service.AbstractService;
 import superapp.service.MiniAppCommandService;
+import superapp.service.UserService;
 import superapp.utils.EmailChecker;
 
 import static superapp.common.Consts.APPLICATION_NAME;
@@ -25,28 +25,33 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class MiniAppCommandServiceImpl extends AbstractService implements MiniAppCommandService {
+public class MiniAppCommandServiceImpl implements MiniAppCommandService {
 
     private static final Logger logger = LoggerFactory.getLogger(MiniAppCommandServiceImpl.class);
     @Autowired
     private MiniAppCommandsRepository miniAppCommandsRepository;
-    private UserRepository userRepository;
     private ObjectRepository objectRepository;
     @Autowired
     private Environment environment;
 
-    public MiniAppCommandServiceImpl(MiniAppCommandsRepository miniAppRepo, UserRepository userRepository, ObjectRepository objectRepository) {
+    private UserService userService;
+
+    public MiniAppCommandServiceImpl(MiniAppCommandsRepository miniAppRepo,
+                                     UserRepository userRepository,
+                                     ObjectRepository objectRepository,
+                                     UserService userService) {
         super();
         this.miniAppCommandsRepository = miniAppRepo;
-        this.userRepository = userRepository;
         this.objectRepository = objectRepository;
+        this.userService = userService;
     }
 
     @Override
-    public Object invokeACommand(String miniAppName,MiniAppCommandBoundary command) {
-    	this.checkInvokedCommand(command);
-    	UserId userId = new UserId(command.getInvokedBy().getUserId().getSuperapp(), command.getInvokedBy().getUserId().getEmail());
-        return isValidUserCredentials(userId, UserRole.MINIAPP_USER, userRepository)
+    public Object invokeACommand(String miniAppName, MiniAppCommandBoundary command) {
+        this.checkInvokedCommand(command);
+        String superApp = command.getInvokedBy().getUserId().getSuperapp();
+        String email = command.getInvokedBy().getUserId().getEmail();
+        return userService.isValidUserCredentials(email,superApp, UserRole.MINIAPP_USER)
                 .flatMap(isValid -> {
                     if (!isValid) {
                         return Mono.error(new IllegalAccessException(MINI_APP_PERMISSION_EXCEPTION));
@@ -73,27 +78,27 @@ public class MiniAppCommandServiceImpl extends AbstractService implements MiniAp
                 })
                 .log();
     }
-    
+
     private void checkInvokedCommand(MiniAppCommandBoundary command) {
-    	if(command.getInvokedBy() == null ||
-    			command.getInvokedBy().getUserId() == null ||
-    			command.getInvokedBy().getUserId().getSuperapp() == null ||
-    			command.getInvokedBy().getUserId().getEmail() == null ||
-    			command.getInvokedBy().getUserId().getSuperapp().isBlank() ||
-    			command.getInvokedBy().getUserId().getEmail().isBlank())
+        if (command.getInvokedBy() == null ||
+                command.getInvokedBy().getUserId() == null ||
+                command.getInvokedBy().getUserId().getSuperapp() == null ||
+                command.getInvokedBy().getUserId().getEmail() == null ||
+                command.getInvokedBy().getUserId().getSuperapp().isBlank() ||
+                command.getInvokedBy().getUserId().getEmail().isBlank())
             throw new InvalidInputException("Invoked by fields cannot be missing or empty");
-        
-    	if (!EmailChecker.isValidEmail(command.getInvokedBy().getUserId().getEmail()))
+
+        if (!EmailChecker.isValidEmail(command.getInvokedBy().getUserId().getEmail()))
             throw new InvalidInputException("Invalid invoking user email");
 
         if (command.getTargetObject() == null ||
-        		command.getTargetObject().getObjectId() == null ||
-        		command.getTargetObject().getObjectId().getSuperapp() == null ||
-        		command.getTargetObject().getObjectId().getId() == null ||
-        		command.getTargetObject().getObjectId().getSuperapp().isBlank() ||
-        		command.getTargetObject().getObjectId().getId().isBlank())
+                command.getTargetObject().getObjectId() == null ||
+                command.getTargetObject().getObjectId().getSuperapp() == null ||
+                command.getTargetObject().getObjectId().getId() == null ||
+                command.getTargetObject().getObjectId().getSuperapp().isBlank() ||
+                command.getTargetObject().getObjectId().getId().isBlank())
             throw new InvalidInputException("Target object fields cannot be missing or empty");
-        
+
         if (command.getCommand() == null || command.getCommand().isEmpty())
             throw new InvalidInputException("Command attribute cannot be missing or empty");
     }

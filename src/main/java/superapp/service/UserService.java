@@ -1,9 +1,11 @@
 package superapp.service;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.user.NewUserBoundary;
 import superapp.boundary.user.UserBoundary;
 import superapp.entity.user.UserId;
+import superapp.entity.user.UserRole;
 
 
 public interface UserService {
@@ -17,5 +19,9 @@ public interface UserService {
 
     Mono<Void> deleteUser(String superApp, String userEmail);
 
+    Mono<Void> deleteAllUser();
 
+    Mono<Boolean> isValidUserCredentials(String email, String superApp, UserRole role);
+
+    Flux<UserBoundary> getAllUsers();
 }

@@ -6,26 +6,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.user.NewUserBoundary;
 import superapp.boundary.user.UserBoundary;
 import superapp.entity.user.UserEntity;
 import superapp.entity.user.UserId;
+import superapp.entity.user.UserRole;
 import superapp.exception.NotFoundException;
 import superapp.repository.UserRepository;
-import superapp.service.AbstractService;
 import superapp.service.UserService;
 import superapp.utils.Validator;
 
-
 import java.util.Arrays;
 
-
-import static ch.qos.logback.core.util.OptionHelper.isNullOrEmpty;
 import static superapp.common.Consts.APPLICATION_NAME;
 
 @Service
-public class UserServiceImpl extends AbstractService implements UserService {
+public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
@@ -93,13 +91,31 @@ public class UserServiceImpl extends AbstractService implements UserService {
                 .then();
     }
 
+    @Override
+    public Mono<Void> deleteAllUser() {
+        return userRepository.deleteAll().log();
+    }
+
+
+    @Override
+    public Mono<Boolean> isValidUserCredentials(String email, String superApp, UserRole role) {
+        UserId userId = new UserId(superApp, email);
+        return userRepository.findById(userId)
+                .map(user -> user.getRole().equals(role))
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))));
+    }
+
+    @Override
+    public Flux<UserBoundary> getAllUsers() {
+        return userRepository.findAll().map(UserBoundary::new).log();
+    }
 
 
     private Mono<UserEntity> updateUserEntity(UserEntity userEntity, UserBoundary userToUpdate) {
-        if(userToUpdate.getAvatar() != null){
+        if (userToUpdate.getAvatar() != null) {
             userEntity.setAvatar(userToUpdate.getAvatar());
         }
-        if(userToUpdate.getUsername() != null){
+        if (userToUpdate.getUsername() != null) {
             userEntity.setUserName(userToUpdate.getUsername());
         }
         return Mono.just(userEntity).log();
@@ -110,12 +126,12 @@ public class UserServiceImpl extends AbstractService implements UserService {
             throw new IllegalArgumentException(userBoundary.getEmail() + " is invalid email address");
         }
         if (Validator.isNullOrEmpty(userBoundary.getUsername())) {
-            throw new  IllegalArgumentException("Username must be provided and not be empty");
+            throw new IllegalArgumentException("Username must be provided and not be empty");
         }
         if (!isValidUserRole(userBoundary.getRole())) {
             throw new IllegalArgumentException(userBoundary.getRole() + " is invalid user role");
         }
-        if(Validator.isNullOrEmpty(userBoundary.getAvatar())){
+        if (Validator.isNullOrEmpty(userBoundary.getAvatar())) {
             throw new IllegalArgumentException("Avatar must be provided and not be empty");
         }
 

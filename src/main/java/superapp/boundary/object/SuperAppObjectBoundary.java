@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import superapp.entity.object.CreatedBy;
+import superapp.entity.object.ObjectId;
+import superapp.entity.object.SuperAppObjectEntity;
 
 public class SuperAppObjectBoundary {
     private SuperAppObjectIdBoundary superAppObjectIdBoundary;
@@ -30,6 +32,29 @@ public class SuperAppObjectBoundary {
         this.createdBy = createdBy;
         this.creationTimestamp = creationTimestamp;
         this.objectDetails = objectDetails;
+    }
+
+    public SuperAppObjectBoundary(SuperAppObjectEntity superAppObjectEntity){
+        super();
+        this.superAppObjectIdBoundary = new SuperAppObjectIdBoundary(superAppObjectEntity.getObjectId().getSuperapp(), superAppObjectEntity.getObjectId().getId());
+        this.type = superAppObjectEntity.getType();
+        this.alias = superAppObjectEntity.getAlias();
+        this.active = superAppObjectEntity.getActive();
+        this.createdBy = superAppObjectEntity.getCreatedBy();
+        this.creationTimestamp = superAppObjectEntity.getCreationTimestamp();
+        this.objectDetails = superAppObjectEntity.getObjectDetails();
+    }
+
+    public SuperAppObjectEntity toEntity(){
+        SuperAppObjectEntity entity = new SuperAppObjectEntity();
+        entity.setObjectId(new ObjectId(this.superAppObjectIdBoundary.getSuperapp(), this.superAppObjectIdBoundary.getId()));
+        entity.setType(this.type);
+        entity.setAlias(this.alias);
+        entity.setActive(this.active);
+        entity.setCreatedBy(this.createdBy);
+        entity.setCreationTimestamp(this.creationTimestamp);
+        entity.setObjectDetails(this.objectDetails);
+        return entity;
     }
 
 

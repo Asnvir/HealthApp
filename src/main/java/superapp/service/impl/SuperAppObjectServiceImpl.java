@@ -12,39 +12,35 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.object.SuperAppObjectBoundary;
 import superapp.boundary.object.SuperAppObjectIdBoundary;
-import superapp.convertors.SuperAppObjectConverter;
 import superapp.entity.object.SuperAppObjectEntity;
 import superapp.entity.object.ObjectId;
-import superapp.entity.user.UserId;
 import superapp.entity.user.UserRole;
 import superapp.exception.InvalidInputException;
 import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
-import superapp.repository.UserRepository;
-import superapp.service.AbstractService;
 import superapp.service.SuperAppObjectService;
+import superapp.service.UserService;
 import superapp.utils.EmailChecker;
 import superapp.utils.Validator;
 import static superapp.common.Consts.APPLICATION_NAME;
 import static superapp.exception.Consts.SUPER_APP_PERMISSION_EXCEPTION;
 
 @Service
-public class SuperAppObjectServiceImpl extends AbstractService implements SuperAppObjectService {
+public class SuperAppObjectServiceImpl implements SuperAppObjectService {
     private static final Logger logger = LoggerFactory.getLogger(SuperAppObjectServiceImpl.class);
     private final ObjectRepository objectRep;
 
-    private  final  UserRepository userRepository;
-
-    private  final SuperAppObjectConverter superAppObjectConverter;
+    private final UserService userService;
 
     @Autowired
     private Environment environment;
 
-    public SuperAppObjectServiceImpl(ObjectRepository objectRep, UserRepository userRepository, SuperAppObjectConverter superAppObjectConverter) {
+    public SuperAppObjectServiceImpl(ObjectRepository objectRep,
+                                     UserService userService
+    ) {
         super();
         this.objectRep = objectRep;
-        this.userRepository = userRepository;
-        this.superAppObjectConverter = superAppObjectConverter;
+        this.userService = userService;
     }
 
     @Override
@@ -54,18 +50,17 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
         object.setObjectId(new SuperAppObjectIdBoundary(environment.getProperty(APPLICATION_NAME), UUID.randomUUID().toString()));
         object.setCreationTimestamp(new Date());
         return this.objectRep
-                .save(superAppObjectConverter.toEntity(object))
-                .map(superAppObjectConverter::toBoundary)
+                .save(object.toEntity())
+                .map(SuperAppObjectBoundary::new)
                 .log();
     }
 
     @Override
     public Mono<Void> update(String superApp, SuperAppObjectBoundary objectToUpdate, String id, String userSuperapp, String email) {
-        UserId userId = new UserId(userSuperapp, email);
         ObjectId objectId = new ObjectId(superApp, id);
-        validateObject(objectToUpdate); // Assuming this is a synchronous validation method
+        validateObject(objectToUpdate);
 
-        return isValidUserCredentials(userId, UserRole.SUPERAPP_USER, userRepository)
+        return userService.isValidUserCredentials(email,superApp, UserRole.SUPERAPP_USER)
                 .flatMap(isValid -> {
                     if (!Boolean.TRUE.equals(isValid)) {
                         return Mono.error(new IllegalAccessException(SUPER_APP_PERMISSION_EXCEPTION));
@@ -83,7 +78,7 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
     private Mono<SuperAppObjectEntity> updateObjectEntity(SuperAppObjectEntity superAppObjectEntity,
                                                           SuperAppObjectBoundary objectToUpdate) {
         superAppObjectEntity.setType(objectToUpdate.getType());
-        superAppObjectEntity.setObjectDetails(objectToUpdate.getObjectDetails().toString());
+        superAppObjectEntity.setObjectDetails(objectToUpdate.getObjectDetails());
         superAppObjectEntity.setAlias(objectToUpdate.getAlias());
         superAppObjectEntity.setActive(objectToUpdate.getActive());
         return Mono.just(superAppObjectEntity).log();
@@ -92,27 +87,22 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
     @Override
     public Mono<SuperAppObjectBoundary> get(String superapp, String id, String userSuperapp, String email) {
         ObjectId objectId = new ObjectId(superapp, id);
-        UserId userId = new UserId(userSuperapp, email);
-        return isValidUserCredentials(userId, UserRole.SUPERAPP_USER, userRepository)
+        return userService.isValidUserCredentials(email,userSuperapp, UserRole.SUPERAPP_USER)
                 .flatMap(isSuperAppUser -> {
                     if (Boolean.TRUE.equals(isSuperAppUser)) {
-                        // If the user is a SUPERAPP_USER, return the object directly
                         return this.objectRep.findById(objectId)
-                                .map(superAppObjectConverter::toBoundary)
+                                .map(SuperAppObjectBoundary::new)
                                 .log();
                     } else {
-                        // Check if the user is a MINIAPP_USER
-                        return isValidUserCredentials(userId, UserRole.MINIAPP_USER, userRepository)
+                        return userService.isValidUserCredentials(email,userSuperapp, UserRole.MINIAPP_USER)
                                 .flatMap(isMiniAppUser -> {
                                     if (Boolean.TRUE.equals(isMiniAppUser)) {
-                                        // If the user is a MINIAPP_USER, check if the object is active
                                         return this.objectRep.findById(objectId)
                                                 .filter(SuperAppObjectEntity::getActive)
-                                                .map(superAppObjectConverter::toBoundary)
+                                                .map(SuperAppObjectBoundary::new)
                                                 .log()
                                                 .switchIfEmpty(Mono.error(new IllegalAccessException("Object is not active or does not exist")));
                                     } else {
-                                        // If the user is neither, deny access
                                         return Mono.error(new IllegalAccessException("Permission Denied"));
                                     }
                                 });
@@ -122,38 +112,35 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
 
     @Override
     public Flux<SuperAppObjectBoundary> getAll(String superapp, String email) {
-    	UserId userId = new UserId(superapp, email);
-        Flux<SuperAppObjectBoundary> objects = this.objectRep.findAll().map(superAppObjectConverter::toBoundary).log();
-        return filterObjectsBasedOnUserRole(userId, objects);
+        Flux<SuperAppObjectBoundary> objects = this.objectRep.findAll().map(SuperAppObjectBoundary::new).log();
+        return filterObjectsBasedOnUserRole(email,superapp, objects);
     }
 
     @Override
     public Flux<SuperAppObjectBoundary> getObjectsByType(String type, String superApp, String email) {
     	checkValidationBeforeGetCommands(type,superApp,email);
-    	UserId userId = new UserId(superApp, email);
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findByType(type)
-                .map(superAppObjectConverter::toBoundary)
+                .map(SuperAppObjectBoundary::new)
                 .log();
 
-        return filterObjectsBasedOnUserRole(userId, objects);
+        return filterObjectsBasedOnUserRole(email,superApp, objects);
     }
 
     @Override
     public Flux<SuperAppObjectBoundary> getObjectsByAlias(String alias, String superApp, String email) {
     	checkValidationBeforeGetCommands(alias,superApp,email);
-    	UserId userId = new UserId(superApp, email);
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findByAlias(alias)
-                .map(superAppObjectConverter::toBoundary)
+                .map(SuperAppObjectBoundary::new)
                 .log();
 
-        return filterObjectsBasedOnUserRole(userId, objects);
+        return filterObjectsBasedOnUserRole(email,superApp, objects);
     }
 
-    private Flux<SuperAppObjectBoundary> filterObjectsBasedOnUserRole(UserId userId, Flux<SuperAppObjectBoundary> objects) {
-        Mono<UserRole> userRoleMono = isValidUserCredentials(userId, UserRole.SUPERAPP_USER, userRepository)
+    private Flux<SuperAppObjectBoundary> filterObjectsBasedOnUserRole(String email,String superApp, Flux<SuperAppObjectBoundary> objects) {
+        Mono<UserRole> userRoleMono = userService.isValidUserCredentials(email,superApp, UserRole.SUPERAPP_USER)
                 .flatMap(isSuperAppUser -> isSuperAppUser ? Mono.just(UserRole.SUPERAPP_USER) : Mono.empty())
                 .switchIfEmpty(
-                        isValidUserCredentials(userId, UserRole.MINIAPP_USER, userRepository)
+                        userService.isValidUserCredentials(email,superApp, UserRole.MINIAPP_USER)
                                 .flatMap(isMiniAppUser -> isMiniAppUser ? Mono.just(UserRole.MINIAPP_USER) : Mono.empty())
                 );
 
@@ -202,13 +189,11 @@ public class SuperAppObjectServiceImpl extends AbstractService implements SuperA
 	@Override
 	public Flux<SuperAppObjectBoundary> findByAliasContaining(String pattern, String superApp, String email) {
 	    checkValidationBeforeGetCommands(pattern, superApp, email);
-	    UserId userId = new UserId(superApp, email);
-	    
 	    Flux<SuperAppObjectBoundary> objects = this.objectRep.findByAliasRegex(".*" + pattern + ".*")
-	            .map(superAppObjectConverter::toBoundary)
+	            .map(SuperAppObjectBoundary::new)
 	            .log();
 	    
-	    return filterObjectsBasedOnUserRole(userId, objects);
+	    return filterObjectsBasedOnUserRole(email,superApp, objects);
 	}
 
 }
