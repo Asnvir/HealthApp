@@ -169,13 +169,15 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
         if (superAppObjectBoundary.getCreatedBy() == null ||
                 superAppObjectBoundary.getCreatedBy().getUserId() == null ||
                 superAppObjectBoundary.getCreatedBy().getUserId().getEmail() == null ||
-                superAppObjectBoundary.getCreatedBy().getUserId().getSuperapp() == null ||
-                !Validator.isValidEmail(superAppObjectBoundary.getCreatedBy().getUserId().getEmail())
+                superAppObjectBoundary.getCreatedBy().getUserId().getSuperapp() == null
         ) {
 
             {
-                throw new IllegalArgumentException("Object createdBy is required");
+                throw new IllegalArgumentException("Object createdBy fields is missing");
             }
+        }
+        if (!Validator.isValidEmail(superAppObjectBoundary.getCreatedBy().getUserId().getEmail())) {
+            throw new IllegalArgumentException("Invalid createdBy user email");
         }
     }
     
