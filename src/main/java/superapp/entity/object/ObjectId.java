@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class ObjectId implements Serializable {
 	private String superapp;
 
-	@Id
+
     private String id;
 	
     public ObjectId() {  	

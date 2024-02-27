@@ -22,6 +22,9 @@ dependencies {
 	implementation 'org.springframework.integration:spring-integration-http'
 	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0'
 
+	// AsyncHttpClient dependency
+	implementation 'org.asynchttpclient:async-http-client:2.12.3'
+
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

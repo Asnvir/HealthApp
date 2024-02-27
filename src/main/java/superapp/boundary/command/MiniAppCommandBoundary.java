@@ -31,9 +31,10 @@ public class MiniAppCommandBoundary {
         this.commandAttributes = entity.getCommandAttributes();
     }
 
-    public MiniAppCommandBoundary(String command, TargetObject targetObject,
+    public MiniAppCommandBoundary(MiniAppCommandIdBoundary commandId, String command, TargetObject targetObject,
                                   Date invocationTimestamp, InvokedBy invokedBy, Map<String, Object> commandAttributes) {
         super();
+        this.commandId = commandId;
         this.command = command;
         this.targetObject = targetObject;
         this.invocationTimestamp = invocationTimestamp;
