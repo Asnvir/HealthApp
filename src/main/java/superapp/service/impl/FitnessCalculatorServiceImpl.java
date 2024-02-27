@@ -10,7 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.api.FitnessCalculatorApi;
 import superapp.entity.command.MiniAppCommandEntity;
-import superapp.entity.fitness.BmiResult;
+import superapp.boundary.fitness.BmiResult;
 import superapp.entity.object.ObjectId;
 import superapp.entity.object.SuperAppObjectEntity;
 import superapp.exception.NotFoundException;
