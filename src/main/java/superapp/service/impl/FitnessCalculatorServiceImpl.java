@@ -180,3 +180,5 @@ public class FitnessCalculatorServiceImpl implements FitnessCalculatorService {
     }
 
 }
+
+//test
