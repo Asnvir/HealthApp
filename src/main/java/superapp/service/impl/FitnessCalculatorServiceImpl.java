@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.api.FitnessCalculatorApi;
+import superapp.boundary.fitness.BodyFatPercentage;
 import superapp.entity.command.MiniAppCommandEntity;
 import superapp.boundary.fitness.BmiResult;
 import superapp.entity.object.ObjectId;
@@ -46,6 +47,9 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
             case "calculateBmi" ->{
                 return calculateBmi(obj).flatMapMany(Flux::just);
             }
+            case "calculateBodyFatPercentage" ->{
+                return calculateBodyFatPercentage(obj).flatMapMany(Flux::just);
+            }
                 default -> throw new NotFoundException("UNKNOWN_COMMAND_EXCEPTION");
             }
 
@@ -76,7 +80,27 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
 
     @Override
     public Mono<Object> calculateBodyFatPercentage(SuperAppObjectEntity object) {
-        return null;
+        double height = Double.parseDouble(object.getObjectDetails().getOrDefault("height", "0").toString());
+        double weight = Double.parseDouble(object.getObjectDetails().getOrDefault("weight", "0").toString());
+        int age = Integer.parseInt(object.getObjectDetails().getOrDefault("age", "0").toString());
+        String gender = object.getObjectDetails().getOrDefault("gender","male").toString();
+        double waist = Double.parseDouble(object.getObjectDetails().getOrDefault("waist", "0").toString());
+        double neck = Double.parseDouble(object.getObjectDetails().getOrDefault("neck", "0").toString());
+        double hip = Double.parseDouble(object.getObjectDetails().getOrDefault("hip", "0").toString());
+        return FitnessCalculatorApi.calculateFatPercentage(age,gender,weight,height,waist,hip, neck)
+                .doOnSuccess(response -> logger.info("Response before flatMap: " + response))
+                .flatMap(response -> {
+                    logger.info("Inside flatMap with response: " + response);
+                    try {
+                        JsonNode rootNode = objectMapper.readTree(response);
+                        JsonNode dataNode = rootNode.path("data");
+                        BodyFatPercentage bodyFatPercentage = objectMapper.treeToValue(dataNode, BodyFatPercentage.class);
+                        return Mono.just((Object)bodyFatPercentage);
+                    } catch (JsonProcessingException e) {
+                        logger.error("Error parsing JSON response", e);
+                        return Mono.error(e);
+                    }
+                });
     }
 
     @Override
