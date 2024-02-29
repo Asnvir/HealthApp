@@ -55,7 +55,7 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
             case "calculateDailyCaloricBudget" ->{
                 return getDailyCalories(obj).flatMapMany(Flux::just);
             }
-            case "calculateIdelWeight" ->{
+            case "calculateIdealWeight" ->{
                 return getIdealWeight(obj).flatMapMany(Flux::just);
             }
                 default -> throw new NotFoundException("UNKNOWN_COMMAND_EXCEPTION");
@@ -98,6 +98,7 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
                         JsonNode rootNode = objectMapper.readTree(response);
                         JsonNode dataNode = rootNode.path("data");
                         IdealWeightResult idealWeightReesult = objectMapper.treeToValue(dataNode, IdealWeightResult.class);
+                        idealWeightReesult.updateAVG();
                         return Mono.just((Object)idealWeightReesult);
                     } catch (JsonProcessingException e) {
                         logger.error("Error parsing JSON response", e);
@@ -139,7 +140,7 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
         double weight = Double.parseDouble(object.getObjectDetails().getOrDefault("weight", "0").toString());
         int age = Integer.parseInt(object.getObjectDetails().getOrDefault("age", "0").toString());
         String gender = object.getObjectDetails().getOrDefault("gender","male").toString();
-        String activityLevel = object.getObjectDetails().getOrDefault("activityLevel","levl_1").toString();
+        String activityLevel = object.getObjectDetails().getOrDefault("activitylevel","level_1").toString();
         return FitnessCalculatorApi.calculateDailyCalory(age,gender,height,weight,activityLevel)
                 .doOnSuccess(response -> logger.info("Response before flatMap: " + response))
                 .flatMap(response -> {

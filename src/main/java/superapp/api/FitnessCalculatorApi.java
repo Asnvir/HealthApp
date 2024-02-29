@@ -50,7 +50,7 @@ public class FitnessCalculatorApi {
     }
     
     public static Mono<String> calculateDailyCalory(int age, String gender, double height, double weight, String activityLevel) {
-        String url = "https://fitness-calculator.p.rapidapi.com/bodyfat?age=" + age + "&gender=" + gender +
+        String url = "https://fitness-calculator.p.rapidapi.com/dailycalorie?age=" + age + "&gender=" + gender +
                 "&weight=" + weight + "&height=" + height + "&activitylevel=" +activityLevel;
         return Mono.fromFuture(() ->
                 asyncHttpClient.prepareGet(url)
