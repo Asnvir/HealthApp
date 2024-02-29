@@ -18,17 +18,6 @@ public class MiniAppCommandBoundary {
     private Map<String, Object> commandAttributes;
 
     public MiniAppCommandBoundary() {
-        this.commandAttributes = new TreeMap<>();
-    }
-
-    public MiniAppCommandBoundary(MiniAppCommandEntity entity) {
-        this.commandId = new MiniAppCommandIdBoundary(entity.getCommandId().getSuperapp(),
-                entity.getCommandId().getMiniApp(), entity.getCommandId().getId());
-        this.command = entity.getCommand();
-        this.targetObject = entity.getTargetObject();
-        this.invocationTimestamp = entity.getInvocationTimestamp();
-        this.invokedBy = entity.getInvokedBy();
-        this.commandAttributes = entity.getCommandAttributes();
     }
 
     public MiniAppCommandBoundary(MiniAppCommandIdBoundary commandId, String command, TargetObject targetObject,
