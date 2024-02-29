@@ -78,7 +78,9 @@ public class SuperAppObjectController {
                 .doOnError(error -> logger.error("Error updating object for userId: {}", id));
     }
 
-    @GetMapping("/search/byType/{type}")
+    @GetMapping(
+            path = {"/search/byType/{type}"},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public Flux<SuperAppObjectBoundary> getObjectsByType(@PathVariable("type") String type,
                                                          @RequestParam("userSuperapp") String superApp,
                                                          @RequestParam("userEmail") String email
@@ -90,7 +92,9 @@ public class SuperAppObjectController {
 
     }
 
-    @GetMapping("/search/byAlias/{alias}")
+    @GetMapping(
+            path = {"/search/byAlias/{alias}"},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public Flux<SuperAppObjectBoundary> getObjectsByAlias(@PathVariable("alias") String alias,
                                                           @RequestParam("userSuperapp") String superApp,
                                                           @RequestParam("userEmail") String email
@@ -103,7 +107,9 @@ public class SuperAppObjectController {
 
     }
     
-    @GetMapping("/search/byAliasPattern/{pattern}")
+    @GetMapping(
+            path = {"/search/byAliasPattern/{pattern}"},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public Flux<SuperAppObjectBoundary> getObjectsByAliasPattern(@PathVariable("pattern") String pattern,
                                                           @RequestParam("userSuperapp") String superApp,
                                                           @RequestParam("userEmail") String email
