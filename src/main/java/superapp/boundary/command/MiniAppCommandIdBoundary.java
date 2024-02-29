@@ -2,9 +2,7 @@ package superapp.boundary.command;
 
 public class MiniAppCommandIdBoundary {
     private String superapp;
-
     private String miniApp;
-
     private String id;
 
     public MiniAppCommandIdBoundary() {

@@ -55,7 +55,7 @@ public class MiniAppCommandServiceImpl implements MiniAppCommandService {
     }
 
     @Override
-    public Object invokeACommand(String miniAppName, MiniAppCommandBoundary command) {
+    public Flux<Object> invokeACommand(String miniAppName, MiniAppCommandBoundary command) {
         this.checkInvokedCommand(command);
         String superApp = command.getInvokedBy().getUserId().getSuperapp();
         String email = command.getInvokedBy().getUserId().getEmail();
