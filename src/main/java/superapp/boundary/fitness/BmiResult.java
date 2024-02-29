@@ -8,7 +8,7 @@ public class BmiResult {
     private String health;
     private String healthyBmiRange;
 
-public BmiResult() {
+    public BmiResult() {
     }
 
     public BmiResult(double bmi, String health, String healthyBmiRange) {

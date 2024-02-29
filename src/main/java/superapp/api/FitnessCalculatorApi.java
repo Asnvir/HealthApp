@@ -48,4 +48,37 @@ public class FitnessCalculatorApi {
                         }));
 
     }
+    
+    public static Mono<String> calculateDailyCalory(int age, String gender, double height, double weight, String activityLevel) {
+        String url = "https://fitness-calculator.p.rapidapi.com/bodyfat?age=" + age + "&gender=" + gender +
+                "&weight=" + weight + "&height=" + height + "&activitylevel=" +activityLevel;
+        return Mono.fromFuture(() ->
+                asyncHttpClient.prepareGet(url)
+                        .setHeader("X-RapidAPI-Key", XRapidAPIKey)
+                        .setHeader("X-RapidAPI-Host", RAPID_API_HOST)
+                        .execute()
+                        .toCompletableFuture()
+                        .thenApply(response -> {
+                            String responseBody = response.getResponseBody();
+                            logger.info("Response from fitness calculator: " + responseBody);
+                            return responseBody;
+                        }));
+
+    }
+    
+    public static Mono<String> calculateIdelWeight(String gender, double height) {
+        String url = "https://fitness-calculator.p.rapidapi.com/idealweight?gender=" + gender + "&height=" + height;
+        return Mono.fromFuture(() ->
+                asyncHttpClient.prepareGet(url)
+                        .setHeader("X-RapidAPI-Key", XRapidAPIKey)
+                        .setHeader("X-RapidAPI-Host", RAPID_API_HOST)
+                        .execute()
+                        .toCompletableFuture()
+                        .thenApply(response -> {
+                            String responseBody = response.getResponseBody();
+                            logger.info("Response from fitness calculator: " + responseBody);
+                            return responseBody;
+                        }));
+
+    }
 }
