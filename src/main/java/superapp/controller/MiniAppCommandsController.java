@@ -29,6 +29,4 @@ public class MiniAppCommandsController {
         return miniAppCommandService.invokeACommand(miniAppName, newMiniAppCommand);
     }
 
-    ////
-
 }
