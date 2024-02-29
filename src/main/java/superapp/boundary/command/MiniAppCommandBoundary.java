@@ -18,7 +18,6 @@ public class MiniAppCommandBoundary {
     private Map<String, Object> commandAttributes;
 
     public MiniAppCommandBoundary() {
-        this.commandAttributes = new TreeMap<>();
     }
 
     public MiniAppCommandBoundary(MiniAppCommandEntity entity) {

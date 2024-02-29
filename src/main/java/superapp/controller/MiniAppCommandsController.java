@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.command.MiniAppCommandBoundary;
 import superapp.service.MiniAppCommandService;
@@ -20,13 +22,11 @@ public class MiniAppCommandsController {
     private MiniAppCommandService miniAppCommandService;
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Object invokeMiniAppCommand(
+    public Flux<Object> invokeMiniAppCommand(
             @PathVariable("miniAppName") String miniAppName,
             @RequestBody MiniAppCommandBoundary newMiniAppCommand) {
         logger.info("Received a request to invoke a new command {}", newMiniAppCommand);
         return miniAppCommandService.invokeACommand(miniAppName, newMiniAppCommand);
     }
-
-    //
 
 }
