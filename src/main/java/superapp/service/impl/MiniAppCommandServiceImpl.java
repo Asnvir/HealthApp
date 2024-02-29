@@ -77,7 +77,6 @@ public class MiniAppCommandServiceImpl implements MiniAppCommandService {
 
     private Mono<SuperAppObjectEntity> validateAndFetchActiveObject(ObjectId objectId) {
         return objectRepository.findById(objectId)
-                //TODO: now object is SuperObjectEntity, but I think it has to be SuperAppObjectBoundary
                 .flatMap(object -> {
                     if (!object.getActive()) {
                         return Mono.error(new IllegalAccessException("Object is not active"));
