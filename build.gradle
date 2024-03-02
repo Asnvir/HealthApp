@@ -24,7 +24,6 @@ dependencies {
 
 	// AsyncHttpClient dependency
 	implementation 'org.asynchttpclient:async-http-client:2.12.3'
-	implementation 'org.asynchttpclient:async-http-client-3.0.0Beta3'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

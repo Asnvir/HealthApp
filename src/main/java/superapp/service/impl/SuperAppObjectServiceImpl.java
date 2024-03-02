@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import superapp.entity.user.UserRole;
 import superapp.exception.InvalidInputException;
 import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
+import superapp.service.FitnessCalculatorService;
 import superapp.service.SuperAppObjectService;
 import superapp.service.UserService;
 import superapp.utils.EmailChecker;
@@ -29,6 +31,10 @@ import static superapp.exception.Consts.SUPER_APP_PERMISSION_EXCEPTION;
 public class SuperAppObjectServiceImpl implements SuperAppObjectService {
     private static final Logger logger = LoggerFactory.getLogger(SuperAppObjectServiceImpl.class);
     private final ObjectRepository objectRep;
+    private FitnessCalculatorService fitnessCalculatorService;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     private final UserService userService;
 
@@ -49,16 +55,35 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
         validateObject(object);
         object.setObjectId(new SuperAppObjectIdBoundary(environment.getProperty(APPLICATION_NAME), UUID.randomUUID().toString()));
         object.setCreationTimestamp(new Date());
-        return this.objectRep
-                .save(object.toEntity())
-                .map(SuperAppObjectBoundary::new)
-                .log();
+        try {
+            handleObjectCreation(object);
+        } catch (Exception e) {
+            object.setActive(false);
+            logger.error("Error creating object", e);
+            throw new InvalidInputException("Error creating object");
+        } finally {
+            this.objectRep.save(object.toEntity()).log();
+        }
+        return Mono.just(object);
+    }
+
+    private void handleObjectCreation(SuperAppObjectBoundary object) {
+        String type = object.getType();
+
+        switch (type) {
+            case "UserProfile" -> {
+                fitnessCalculatorService = this.applicationContext.getBean("FitnessCalculator", FitnessCalculatorService.class);
+                fitnessCalculatorService.handleObjectByType(object);
+            }
+            default -> {
+                throw new InvalidInputException("Invalid object type");
+            }
+        }
     }
 
     @Override
     public Mono<Void> update(String superApp, SuperAppObjectBoundary objectToUpdate, String id, String userSuperapp, String email) {
         ObjectId objectId = new ObjectId(superApp, id);
-        validateObject(objectToUpdate);
 
         return userService.isValidUserCredentials(email,superApp, UserRole.SUPERAPP_USER)
                 .flatMap(isValid -> {
@@ -77,10 +102,18 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
 
     private Mono<SuperAppObjectEntity> updateObjectEntity(SuperAppObjectEntity superAppObjectEntity,
                                                           SuperAppObjectBoundary objectToUpdate) {
-        superAppObjectEntity.setType(objectToUpdate.getType());
-        superAppObjectEntity.setObjectDetails(objectToUpdate.getObjectDetails());
-        superAppObjectEntity.setAlias(objectToUpdate.getAlias());
-        superAppObjectEntity.setActive(objectToUpdate.getActive());
+        if (objectToUpdate.getType() != null) {
+            superAppObjectEntity.setType(objectToUpdate.getType());
+        }
+        if (objectToUpdate.getObjectDetails() != null) {
+            superAppObjectEntity.setObjectDetails(objectToUpdate.getObjectDetails());
+        }
+        if (objectToUpdate.getAlias() != null) {
+            superAppObjectEntity.setAlias(objectToUpdate.getAlias());
+        }
+        if (objectToUpdate.getActive() != null) {
+            superAppObjectEntity.setActive(objectToUpdate.getActive());
+        }
         return Mono.just(superAppObjectEntity).log();
     }
 

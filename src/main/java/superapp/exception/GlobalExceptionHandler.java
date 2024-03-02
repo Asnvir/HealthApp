@@ -24,4 +24,11 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<String>> handleIllegalAccessException(IllegalAccessException ex) {
         return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied: " + ex.getMessage()));
     }
+
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<String> handleInvalidInputException(InvalidInputException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }

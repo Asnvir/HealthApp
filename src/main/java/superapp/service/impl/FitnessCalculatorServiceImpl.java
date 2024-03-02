@@ -12,17 +12,18 @@ import superapp.api.FitnessCalculatorApi;
 import superapp.boundary.fitness.BodyFatPercentage;
 import superapp.boundary.fitness.DailyCalorieBudgetResult;
 import superapp.boundary.fitness.IdealWeightResult;
+import superapp.boundary.object.SuperAppObjectBoundary;
 import superapp.entity.command.MiniAppCommandEntity;
 import superapp.boundary.fitness.BmiResult;
 import superapp.entity.object.ObjectId;
 import superapp.entity.object.SuperAppObjectEntity;
+import superapp.exception.InvalidInputException;
 import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
 import superapp.service.FitnessCalculatorService;
-import superapp.service.MiniAppService;
 
 @Service("FitnessCalculator")
-public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalculatorService {
+public class FitnessCalculatorServiceImpl implements FitnessCalculatorService {
 
     private final ObjectRepository objectRepository;
 
@@ -58,10 +59,27 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
             case "calculateIdealWeight" ->{
                 return getIdealWeight(obj).flatMapMany(Flux::just);
             }
-                default -> throw new NotFoundException("UNKNOWN_COMMAND_EXCEPTION");
+                default -> throw new InvalidInputException("UNKNOWN_COMMAND_EXCEPTION");
             }
 
         });
+    }
+
+    @Override
+    public void handleObjectByType(SuperAppObjectBoundary object) {
+        checkUserProfileData(object);
+    }
+
+    private void checkUserProfileData(SuperAppObjectBoundary object) {
+        if (object.getObjectDetails().get("height") == null || object.getObjectDetails().get("weight") == null) {
+            throw new InvalidInputException("MISSING_HEIGHT_OR_WEIGHT");
+        }
+        if(object.getObjectDetails().get("age") == null){
+            throw new InvalidInputException("MISSING_AGE");
+        }
+        if(object.getObjectDetails().get("waist") == null || object.getObjectDetails().get("neck") == null || object.getObjectDetails().get("hip") == null){
+            throw new InvalidInputException("MISSING_WAIST_OR_NECK_OR_HIP");
+        }
     }
 
     @Override
