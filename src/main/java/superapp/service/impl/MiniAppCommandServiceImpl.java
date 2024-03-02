@@ -109,6 +109,10 @@ public class MiniAppCommandServiceImpl implements MiniAppCommandService {
                 return this.fitnessCalculatorService.handleCommand(command);
             }
 
+            case "RecipeManager" -> {
+                this.miniAppService = this.context.getBean("RecipeManager", RecipeManagerServiceImpl.class);
+            }
+
             default -> { throw new InvalidInputException("Unknown miniapp"); }
         }
     }

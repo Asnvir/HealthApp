@@ -29,37 +29,38 @@ public class MenuServiceImpl implements MiniAppService, MenuService {
 
     // Метод для добавления элемента в меню
     public Mono<Object> addItemToMenu(SuperAppObjectBoundary itemToAdd, SuperAppObjectBoundary menu) {
-
-       // Check if the item to add or menu is null
-        if (itemToAdd == null || menu == null) {
-            return Mono.error(new IllegalArgumentException("Item to add or menu cannot be null"));
-        }
-
-        // Check if the item to add is a recipe
-        if (!itemToAdd.getType().equals("ingredient")) {
-            return Mono.error(new IllegalArgumentException("Only ingredient can be added to the menu"));
-        }
-
-        Recipe recipe =
-
-
-        // Add the item to the menu
-        if (menu.getObjectDetails().containsKey("ingredients")) {
-            //If the menu has already an ingredient in the menu, do not add the new ingredient
-            return Mono.error(new IllegalArgumentException("Menu already has an ingredient"));
-
-            // If the menu already has a list of items, add the new object to this list
-            List<String> menuItems = (List<String>) menu.getObjectDetails().get("ingredients");
-            menuItems.add(itemToAdd);
-        } else {
-            // Если в меню еще нет списка элементов, создаем новый список и добавляем в него новый объект
-            List<SuperAppObjectEntity> menuItems = new ArrayList<>();
-            menuItems.add(itemToAdd);
-            menu.getObjectDetails().put("menuItems", menuItems);
-        }
-
-        // Возвращаем обновленное меню
-        return Mono.just(menu);
+//
+//       // Check if the item to add or menu is null
+//        if (itemToAdd == null || menu == null) {
+//            return Mono.error(new IllegalArgumentException("Item to add or menu cannot be null"));
+//        }
+//
+//        // Check if the item to add is a recipe
+//        if (!itemToAdd.getType().equals("ingredient")) {
+//            return Mono.error(new IllegalArgumentException("Only ingredient can be added to the menu"));
+//        }
+//
+//        Recipe recipe =
+//
+//
+//        // Add the item to the menu
+//        if (menu.getObjectDetails().containsKey("ingredients")) {
+//            //If the menu has already an ingredient in the menu, do not add the new ingredient
+//            return Mono.error(new IllegalArgumentException("Menu already has an ingredient"));
+//
+//            // If the menu already has a list of items, add the new object to this list
+//            List<String> menuItems = (List<String>) menu.getObjectDetails().get("ingredients");
+//            menuItems.add(itemToAdd);
+//        } else {
+//            // Если в меню еще нет списка элементов, создаем новый список и добавляем в него новый объект
+//            List<SuperAppObjectEntity> menuItems = new ArrayList<>();
+//            menuItems.add(itemToAdd);
+//            menu.getObjectDetails().put("menuItems", menuItems);
+//        }
+//
+//        // Возвращаем обновленное меню
+//        return Mono.just(menu);
+        return null;
     }
 
     @Override
