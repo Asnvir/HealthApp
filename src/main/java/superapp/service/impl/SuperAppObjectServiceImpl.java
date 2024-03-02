@@ -53,17 +53,26 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
     public Mono<SuperAppObjectBoundary> create(SuperAppObjectBoundary object) {
         logger.info("Creating object {}", object);
         validateObject(object);
-        object.setObjectId(new SuperAppObjectIdBoundary(environment.getProperty(APPLICATION_NAME), UUID.randomUUID().toString()));
-        object.setCreationTimestamp(new Date());
-        try {
-            handleObjectCreation(object);
-        } catch (Exception e) {
-            object.setActive(false);
-            logger.error("Error creating object", e);
-        }
-        return this.objectRep
-                .save(object.toEntity())
-                .map(SuperAppObjectBoundary::new)
+        String email = object.getCreatedBy().getUserId().getEmail();
+        String superApp = object.getCreatedBy().getUserId().getSuperapp();
+        return userService.isValidUserCredentials(email, superApp, UserRole.ADMIN)
+                .flatMap(isValid -> {
+                    if (Boolean.TRUE.equals(isValid)) {
+                        return Mono.error(new IllegalAccessException("Admin cannot create objects"));
+                    }
+                    object.setObjectId(new SuperAppObjectIdBoundary(environment.getProperty(APPLICATION_NAME), UUID.randomUUID().toString()));
+                    object.setCreationTimestamp(new Date());
+
+                    try {
+                        handleObjectCreation(object);
+                    } catch (Exception e) {
+                        object.setActive(false);
+                        logger.error("Error creating object", e);
+                    }
+                    return this.objectRep.save(object.toEntity())
+                            .map(SuperAppObjectBoundary::new)
+                            .doOnSuccess(createdObject -> logger.info("Object created successfully: {}", createdObject));
+                })
                 .log();
     }
 
