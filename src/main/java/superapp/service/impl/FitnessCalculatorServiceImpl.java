@@ -80,6 +80,10 @@ public class FitnessCalculatorServiceImpl implements FitnessCalculatorService {
         if(object.getObjectDetails().get("waist") == null || object.getObjectDetails().get("neck") == null || object.getObjectDetails().get("hip") == null){
             throw new InvalidInputException("MISSING_WAIST_OR_NECK_OR_HIP");
         }
+
+        if (object.getObjectDetails().get("gender") == null){
+            throw new InvalidInputException("MISSING_GENDER");
+        }
     }
 
     @Override

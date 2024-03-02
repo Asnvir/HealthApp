@@ -60,11 +60,11 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
         } catch (Exception e) {
             object.setActive(false);
             logger.error("Error creating object", e);
-            throw new InvalidInputException("Error creating object");
-        } finally {
-            this.objectRep.save(object.toEntity()).log();
         }
-        return Mono.just(object);
+        return this.objectRep
+                .save(object.toEntity())
+                .map(SuperAppObjectBoundary::new)
+                .log();
     }
 
     private void handleObjectCreation(SuperAppObjectBoundary object) {

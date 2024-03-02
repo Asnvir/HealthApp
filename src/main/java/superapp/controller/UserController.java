@@ -21,13 +21,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with the origin of the React app
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public Mono<UserBoundary> createNewUser(@RequestBody NewUserBoundary user) {
         logger.info("Received a request to create a new user {}", user);
         return userService.create(user);
     }
-
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with the origin of the React app
     @GetMapping(path = "/login/{superapp}/{email}", produces = APPLICATION_JSON_VALUE)
     public Mono<UserBoundary> login(@PathVariable("superapp") String superApp,
                                     @PathVariable("email") String email) {
