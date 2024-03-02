@@ -16,7 +16,7 @@ import superapp.entity.user.UserRole;
 import superapp.exception.InvalidInputException;
 import superapp.repository.MiniAppCommandsRepository;
 import superapp.repository.ObjectRepository;
-import superapp.service.MiniAppService;
+import superapp.service.FitnessCalculatorService;
 import superapp.service.MiniAppCommandService;
 import superapp.service.UserService;
 import superapp.utils.EmailChecker;
@@ -40,7 +40,7 @@ public class MiniAppCommandServiceImpl implements MiniAppCommandService {
 
     private UserService userService;
 
-    private MiniAppService miniAppService;
+    private FitnessCalculatorService fitnessCalculatorService;
 
     public MiniAppCommandServiceImpl(MiniAppCommandsRepository miniAppRepo,
                                      ObjectRepository objectRepository,
@@ -105,12 +105,12 @@ public class MiniAppCommandServiceImpl implements MiniAppCommandService {
         String miniAppName = command.getCommandId().getMiniApp();
         switch (miniAppName) {
             case "FitnessCalculator" -> {
-                this.miniAppService = this.context.getBean("FitnessCalculator", FitnessCalculatorServiceImpl.class);
+                this.fitnessCalculatorService = this.context.getBean("FitnessCalculator", FitnessCalculatorService.class);
+                return this.fitnessCalculatorService.handleCommand(command);
             }
 
             default -> { throw new InvalidInputException("Unknown miniapp"); }
         }
-        return this.miniAppService.handleCommand(command);
     }
 
     private void checkInvokedCommand(MiniAppCommandBoundary command) {

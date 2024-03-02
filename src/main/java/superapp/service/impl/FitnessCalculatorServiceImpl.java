@@ -12,17 +12,18 @@ import superapp.api.FitnessCalculatorApi;
 import superapp.boundary.fitness.BodyFatPercentage;
 import superapp.boundary.fitness.DailyCalorieBudgetResult;
 import superapp.boundary.fitness.IdealWeightResult;
+import superapp.boundary.object.SuperAppObjectBoundary;
 import superapp.entity.command.MiniAppCommandEntity;
 import superapp.boundary.fitness.BmiResult;
 import superapp.entity.object.ObjectId;
 import superapp.entity.object.SuperAppObjectEntity;
+import superapp.exception.InvalidInputException;
 import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
 import superapp.service.FitnessCalculatorService;
-import superapp.service.MiniAppService;
 
 @Service("FitnessCalculator")
-public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalculatorService {
+public class FitnessCalculatorServiceImpl implements FitnessCalculatorService {
 
     private final ObjectRepository objectRepository;
 
@@ -55,13 +56,30 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
             case "calculateDailyCaloricBudget" ->{
                 return getDailyCalories(obj).flatMapMany(Flux::just);
             }
-            case "calculateIdelWeight" ->{
+            case "calculateIdealWeight" ->{
                 return getIdealWeight(obj).flatMapMany(Flux::just);
             }
-                default -> throw new NotFoundException("UNKNOWN_COMMAND_EXCEPTION");
+                default -> throw new InvalidInputException("UNKNOWN_COMMAND_EXCEPTION");
             }
 
         });
+    }
+
+    @Override
+    public void handleObjectByType(SuperAppObjectBoundary object) {
+        checkUserProfileData(object);
+    }
+
+    private void checkUserProfileData(SuperAppObjectBoundary object) {
+        if (object.getObjectDetails().get("height") == null || object.getObjectDetails().get("weight") == null) {
+            throw new InvalidInputException("MISSING_HEIGHT_OR_WEIGHT");
+        }
+        if(object.getObjectDetails().get("age") == null){
+            throw new InvalidInputException("MISSING_AGE");
+        }
+        if(object.getObjectDetails().get("waist") == null || object.getObjectDetails().get("neck") == null || object.getObjectDetails().get("hip") == null){
+            throw new InvalidInputException("MISSING_WAIST_OR_NECK_OR_HIP");
+        }
     }
 
     @Override
@@ -98,6 +116,7 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
                         JsonNode rootNode = objectMapper.readTree(response);
                         JsonNode dataNode = rootNode.path("data");
                         IdealWeightResult idealWeightReesult = objectMapper.treeToValue(dataNode, IdealWeightResult.class);
+                        idealWeightReesult.updateAVG();
                         return Mono.just((Object)idealWeightReesult);
                     } catch (JsonProcessingException e) {
                         logger.error("Error parsing JSON response", e);
@@ -139,7 +158,7 @@ public class FitnessCalculatorServiceImpl implements MiniAppService, FitnessCalc
         double weight = Double.parseDouble(object.getObjectDetails().getOrDefault("weight", "0").toString());
         int age = Integer.parseInt(object.getObjectDetails().getOrDefault("age", "0").toString());
         String gender = object.getObjectDetails().getOrDefault("gender","male").toString();
-        String activityLevel = object.getObjectDetails().getOrDefault("activityLevel","levl_1").toString();
+        String activityLevel = object.getObjectDetails().getOrDefault("activitylevel","level_1").toString();
         return FitnessCalculatorApi.calculateDailyCalory(age,gender,height,weight,activityLevel)
                 .doOnSuccess(response -> logger.info("Response before flatMap: " + response))
                 .flatMap(response -> {

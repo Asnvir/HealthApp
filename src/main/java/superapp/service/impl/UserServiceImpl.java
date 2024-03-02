@@ -118,6 +118,9 @@ public class UserServiceImpl implements UserService {
         if (userToUpdate.getUsername() != null) {
             userEntity.setUserName(userToUpdate.getUsername());
         }
+        if (userToUpdate.getRole() != null) {
+            userEntity.setRole(UserRole.valueOf(userToUpdate.getRole()));
+        }
         return Mono.just(userEntity).log();
     }
 
