@@ -18,10 +18,12 @@ import superapp.repository.MiniAppCommandsRepository;
 import superapp.repository.ObjectRepository;
 import superapp.service.FitnessCalculatorService;
 import superapp.service.MiniAppCommandService;
+import superapp.service.RecipeManagerService;
 import superapp.service.UserService;
 import superapp.utils.EmailChecker;
 
 import static superapp.common.Consts.APPLICATION_NAME;
+import static superapp.common.Consts.MINI_APP_NAME_RECIPE_MANAGER;
 import static superapp.exception.Consts.MINI_APP_PERMISSION_EXCEPTION;
 
 import java.util.Date;
@@ -76,7 +78,8 @@ public class MiniAppCommandServiceImpl implements MiniAppCommandService {
     }
 
     private Mono<SuperAppObjectEntity> validateAndFetchActiveObject(ObjectId objectId) {
-        return objectRepository.findById(objectId)
+        return objectRepository
+                .findById(objectId)
                 .flatMap(object -> {
                     if (!object.getActive()) {
                         return Mono.error(new IllegalAccessException("Object is not active"));
@@ -109,8 +112,9 @@ public class MiniAppCommandServiceImpl implements MiniAppCommandService {
                 return this.fitnessCalculatorService.handleCommand(command);
             }
 
-            case "RecipeManager" -> {
-                this.miniAppService = this.context.getBean("RecipeManager", RecipeManagerServiceImpl.class);
+            case MINI_APP_NAME_RECIPE_MANAGER -> {
+                RecipeManagerService recipeManagerService = this.context.getBean(MINI_APP_NAME_RECIPE_MANAGER, RecipeManagerService.class);
+                return recipeManagerService.handleCommand(command);
             }
 
             default -> { throw new InvalidInputException("Unknown miniapp"); }

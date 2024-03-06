@@ -1,9 +1,9 @@
-package superapp.boundary.menu;
+package superapp.boundary.recipe;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import superapp.common.Consts;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static superapp.common.Consts.NUTRITIONAL_INFO_CALORIES;
@@ -67,27 +67,15 @@ public class NutritionalInfo {
 
     public static NutritionalInfo fromObjectToNutritionalInfo(Object nutritionalInfoObject) {
 
-        NutritionalInfo result = new NutritionalInfo();
-        if (!(nutritionalInfoObject instanceof LinkedHashMap<?, ?> nutritionalInfoMap)) {
-            throw new IllegalArgumentException("Invalid nutritional info object format.");
-        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> nutritionalInfoMap = objectMapper.convertValue(nutritionalInfoObject, new TypeReference<Map<String, String>>() {});
 
-
-        Integer caloriesValue = (Integer) nutritionalInfoMap.get(Consts.NUTRITIONAL_INFO_CALORIES);
-        Integer fatValue = (Integer) nutritionalInfoMap.get(Consts.NUTRITIONAL_INFO_FAT);
-        Integer carbsValue = (Integer) nutritionalInfoMap.get(Consts.NUTRITIONAL_INFO_CARBS);
-        Integer proteinValue = (Integer) nutritionalInfoMap.get(Consts.NUTRITIONAL_INFO_PROTEIN);
-
-        if (caloriesValue == null || fatValue == null || carbsValue == null || proteinValue == null) {
-            throw new IllegalArgumentException("Nutritional information cannot be null.");
-        }
-
-        result.setCalories(String.valueOf(caloriesValue));
-        result.setFat(String.valueOf(fatValue));
-        result.setCarbs(String.valueOf(carbsValue));
-        result.setProtein(String.valueOf(proteinValue));
-
-        return result;
+        return new NutritionalInfo(
+                nutritionalInfoMap.get(NUTRITIONAL_INFO_CALORIES),
+                nutritionalInfoMap.get(NUTRITIONAL_INFO_FAT),
+                nutritionalInfoMap.get(NUTRITIONAL_INFO_CARBS),
+                nutritionalInfoMap.get(NUTRITIONAL_INFO_PROTEIN)
+        );
     }
 
     @Override

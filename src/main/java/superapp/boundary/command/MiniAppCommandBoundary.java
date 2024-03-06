@@ -4,17 +4,26 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import superapp.entity.command.TargetObject;
 import superapp.entity.command.InvokedBy;
 import superapp.entity.command.MiniAppCommandEntity;
 import superapp.entity.command.CommandId;
 
+import static superapp.common.Consts.*;
+
 public class MiniAppCommandBoundary {
+    @JsonProperty(COMMAND_ID)
     private MiniAppCommandIdBoundary commandId;
+    @JsonProperty(COMMAND_COMMAND)
     private String command;
+    @JsonProperty(COMMAND_TARGETOBJECT)
     private TargetObject targetObject;
+    @JsonProperty(COMMAND_INVOCATIONTEIMESTAMP)
     private Date invocationTimestamp;
+    @JsonProperty(COMMAND_INVOKEDBY)
     private InvokedBy invokedBy;
+    @JsonProperty(COMMAND_COMMANDATTRIBUTES)
     private Map<String, Object> commandAttributes;
 
     public MiniAppCommandBoundary() {

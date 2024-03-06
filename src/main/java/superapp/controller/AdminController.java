@@ -30,11 +30,6 @@ public class AdminController {
         return adminService.deleteAllUsers(superApp, email);
     }
 
-    @DeleteMapping("/users/{deleteUserEmail}")
-    public Mono<Void> deleteUser(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email, @PathVariable("deleteUserEmail") String deleteUserEmail) {
-        return adminService.deleteUser(superApp, email, deleteUserEmail);
-    }
-
     @DeleteMapping("/objects")
     public Mono<Void> deleteAllObjects(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
         return adminService.deleteAllObjects(superApp, email);
@@ -81,10 +76,4 @@ public class AdminController {
         return adminService.exportMiniAppCommandsHistory(miniAppName, superApp, email);
 
     }
-
-    @GetMapping("/hasUsers")
-    public Mono<Boolean> hasUsers(@RequestParam("userSuperapp") String superApp, @RequestParam("userEmail") String email) {
-        return adminService.hasUsers(superApp, email);
-    }
-
 }

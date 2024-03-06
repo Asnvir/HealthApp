@@ -18,5 +18,6 @@ public interface AdminService {
 
     Mono<UserBoundary> exportUser(String userId, String superApp, String email);
 
-    Mono<Boolean> hasUsers(String superApp, String email);
+
+    Mono<Void> deleteObject(String superApp, String email, String objectId);
 }

@@ -1,8 +1,15 @@
 package superapp.boundary.command;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import static superapp.common.Consts.*;
+
 public class MiniAppCommandIdBoundary {
+    @JsonProperty(COMMAND_ID_SUPERAPP)
     private String superapp;
+    @JsonProperty(COMMAND_ID_MINIAPP)
     private String miniApp;
+    @JsonProperty(COMMAND_ID_ID)
     private String id;
 
     public MiniAppCommandIdBoundary() {

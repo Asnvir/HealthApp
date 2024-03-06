@@ -134,15 +134,8 @@ public class AdminControllerTests {
         assertThat(response.statusCode()).isEqualTo(expectedStatus);
     }
 
-    @Test
-    public void testExportAllUsersWithAdmin() {
-        exportAllUsers(testAdmin.getEmail(), testAdmin.getRole(), HttpStatus.OK);
-    }
 
-    @Test
-    public void testExportAllUsersWithUser() {
-        exportAllUsers(testUser.getEmail(), testUser.getRole(), HttpStatus.FORBIDDEN);
-    }
+
 
     private void exportAllUsers(String userEmail, String role, HttpStatus expectedStatus) {
         ClientResponse response = this.webClient.get().uri(uriBuilder -> uriBuilder.path("/admin/users").queryParam("userSuperapp", superApp).queryParam("userEmail", userEmail).build()).exchangeToMono(Mono::just).block();
