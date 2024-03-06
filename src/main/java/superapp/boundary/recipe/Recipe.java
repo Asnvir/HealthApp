@@ -1,11 +1,19 @@
-package superapp.boundary.menu;
+package superapp.boundary.recipe;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import superapp.boundary.object.SuperAppObjectBoundary;
+import superapp.common.Consts;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
 import static superapp.common.Consts.*;
+
 
 public class Recipe {
 
@@ -18,7 +26,7 @@ public class Recipe {
     @JsonProperty(RECIPE_INSTRUCTIONS)
     private ArrayList<Instruction> instructions;
     @JsonProperty(RECIPE_COOKING_TIME)
-    private String cookingTime;
+    private CookingTime cookingTime;
     @JsonProperty(RECIPE_SERVING_SIZE)
     private String servingSize;
     @JsonProperty(RECIPE_NUTRITIONAL_INFO)
@@ -27,7 +35,7 @@ public class Recipe {
     public Recipe() {
     }
 
-    public Recipe(String name, String description, ArrayList<Ingredient> ingredients, ArrayList<Instruction> instructions, String cookingTime, String servingSize, NutritionalInfo nutritionalInfo) {
+    public Recipe(String name, String description, ArrayList<Ingredient> ingredients, ArrayList<Instruction> instructions, CookingTime cookingTime, String servingSize, NutritionalInfo nutritionalInfo) {
         this.name = name;
         this.description = description;
         this.ingredients = ingredients;
@@ -36,6 +44,23 @@ public class Recipe {
         this.servingSize = servingSize;
         this.nutritionalInfo = nutritionalInfo;
     }
+
+    public Recipe(SuperAppObjectBoundary superAppObjectBoundary) {
+        if (superAppObjectBoundary != null) {
+            Map<String, Object> objectDetails = superAppObjectBoundary.getObjectDetails();
+            if (objectDetails != null && !objectDetails.isEmpty()) {
+                this.name = (String) objectDetails.get(RECIPE_NAME);
+                this.description = (String) objectDetails.get(RECIPE_DESCRIPTION);
+                this.ingredients = RecipeUtil.extractIngredients(objectDetails);
+                this.instructions = RecipeUtil.extractInstructions(objectDetails);
+                this.cookingTime = RecipeUtil.extractCookingTime(objectDetails);;
+//                this.cookingTime = (CookingTime) objectDetails.get(RECIPE_COOKING_TIME);
+                this.servingSize = (String) objectDetails.get(RECIPE_SERVING_SIZE);
+                this.nutritionalInfo = RecipeUtil.extractNutritionalInfo(objectDetails);
+            }
+        }
+    }
+
 
     public String getName() {
         return name;
@@ -69,11 +94,11 @@ public class Recipe {
         this.instructions = instructions;
     }
 
-    public String getCookingTime() {
+    public CookingTime getCookingTime() {
         return cookingTime;
     }
 
-    public void setCookingTime(String cookingTime) {
+    public void setCookingTime(CookingTime cookingTime) {
         this.cookingTime = cookingTime;
     }
 
@@ -93,19 +118,21 @@ public class Recipe {
         this.nutritionalInfo = nutritionalInfo;
     }
 
-    public static Recipe fromObjectDetailstoRecipe(Map<String, Object> objectDetails) {
-        Recipe recipe = new Recipe();
-
-        recipe.setName((String) objectDetails.get(RECIPE_NAME));
-        recipe.setDescription((String) objectDetails.get(RECIPE_DESCRIPTION));
-        recipe.setCookingTime((String) objectDetails.get(RECIPE_COOKING_TIME));
-        recipe.setServingSize((String) objectDetails.get(RECIPE_SERVING_SIZE));
-        recipe.setIngredients(Ingredient.fromObjectIngredientToIngredients(objectDetails.get(RECIPE_INGREDIENTS)));
-        recipe.setInstructions(Instruction.fromObjectInstructionToInstructions(objectDetails.get(RECIPE_INSTRUCTIONS)));
-        recipe.setNutritionalInfo(NutritionalInfo.fromObjectToNutritionalInfo(objectDetails.get(RECIPE_NUTRITIONAL_INFO)));
-
-        return recipe;
-    }
+//    public static Recipe fromObjectToRecipe(Object object) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//
+//        try {
+//            JsonNode rootNode = objectMapper.valueToTree(object);
+//            JsonNode recipeNode = rootNode.path(Consts.OBJECT_DETAILS);
+//            return objectMapper.treeToValue(recipeNode, Recipe.class);
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException("Failed to convert object to Recipe." +
+//                    "\nException: " + e.getMessage() +
+//                    "\nObject: " + object +
+//                    "\nObjectMapper: " + objectMapper
+//                    + "\nJsonNode: " + objectMapper.valueToTree(object));
+//        }
+//    }
 
 
     @Override

@@ -1,10 +1,11 @@
-package superapp.boundary.menu;
+package superapp.boundary.recipe;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static superapp.common.Consts.*;
 
@@ -62,23 +63,9 @@ public class Ingredient {
     }
 
     public static ArrayList<Ingredient> fromObjectIngredientToIngredients(Object ingredientObject) {
-        ArrayList<Ingredient> result = new ArrayList<>();
-        if (ingredientObject instanceof List<?> ingredientsList) {
-            for (Object ingredient : ingredientsList) {
-                if (ingredient instanceof Map<?, ?> ingredientMap) {
-                    Object nameObj = ingredientMap.get(INGREDIENT_NAME);
-                    Object quantityObj = ingredientMap.get(INGREDIENT_QUANTITY);
-                    Object unitObj = ingredientMap.get(INGREDIENT_UNIT);
-                    Object categoryObj = ingredientMap.get(INGREDIENT_CATEGORY);
-
-                    if (nameObj instanceof String && quantityObj instanceof String &&
-                            unitObj instanceof String && categoryObj instanceof String) {
-                        result.add(new Ingredient((String) nameObj, (String) quantityObj, (String) unitObj, (String) categoryObj));
-                    }
-                }
-            }
-        }
-        return result;
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Ingredient> ingredients = objectMapper.convertValue(ingredientObject, new TypeReference<>() {});
+        return new ArrayList<>(ingredients);
     }
 
 

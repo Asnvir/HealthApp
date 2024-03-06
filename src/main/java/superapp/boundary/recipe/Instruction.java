@@ -1,6 +1,10 @@
-package superapp.boundary.menu;
+package superapp.boundary.recipe;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Instruction {
 
@@ -23,12 +27,8 @@ public class Instruction {
     }
 
     public static ArrayList<Instruction> fromObjectInstructionToInstructions(Object instructionObject){
-        ArrayList<Instruction> result = new ArrayList<>();
-        if(instructionObject instanceof ArrayList<?> instructionsList){
-            for (Object instruction : instructionsList) {
-                result.add(new Instruction((String) instruction));
-            }
-        }
-        return result;
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Instruction> instructions = objectMapper.convertValue(instructionObject, new TypeReference<>() {});
+        return new ArrayList<>(instructions);
     }
 }

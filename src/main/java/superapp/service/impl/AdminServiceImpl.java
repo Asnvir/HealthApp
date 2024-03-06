@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.command.MiniAppCommandBoundary;
 import superapp.boundary.user.UserBoundary;
+import superapp.entity.object.ObjectId;
 import superapp.entity.user.UserId;
 import superapp.entity.user.UserRole;
 import superapp.repository.MiniAppCommandsRepository;
@@ -72,17 +73,17 @@ public class AdminServiceImpl implements AdminService {
                 });
     }
 
+
+
     @Override
-    public Mono<Boolean> hasUsers(String superApp, String email) {
-        logger.info("Checking if there are users in AdminServiceImpl");
+    public Mono<Void> deleteObject(String superApp, String email, String objectId) {
+        logger.info("Deleting object in AdminServiceImpl, objectId: " + objectId);
         return userService.isValidUserCredentials(email,superApp, UserRole.ADMIN)
                 .flatMap(isValid -> {
                     if (!isValid) {
                         return Mono.error(new IllegalAccessException(ADMIN_PERMISSION_EXCEPTION));
                     }
-                    return userService.getAllUsers().count()
-                            .map(count -> count > 0)
-                            .log();
+                    return objectRepository.deleteById(new ObjectId(superApp,objectId)).log();
                 });
     }
 
