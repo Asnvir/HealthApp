@@ -1,9 +1,13 @@
 package superapp.entity.object;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import superapp.entity.user.UserId;
 
+import static superapp.common.Consts.OBJECT_CREATED_BY_USERID;
+
 public class CreatedBy {
+	@JsonProperty(OBJECT_CREATED_BY_USERID)
 	private UserId userId;
 
 	

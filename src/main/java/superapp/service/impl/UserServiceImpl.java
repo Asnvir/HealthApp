@@ -101,7 +101,9 @@ public class UserServiceImpl implements UserService {
     public Mono<Boolean> isValidUserCredentials(String email, String superApp, UserRole role) {
         UserId userId = new UserId(superApp, email);
         return userRepository.findById(userId)
-                .map(user -> user.getRole().equals(role))
+                .map(user -> {
+                    System.out.println("Current user email: " + user.getUserId().getEmail() + " and role: " + user.getRole() + " and role to check: " + role);
+                    return  user.getRole().equals(role);})
                 .switchIfEmpty(Mono.error(new NotFoundException(String.format("User with %s not found", userId))));
     }
 
