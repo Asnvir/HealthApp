@@ -22,6 +22,9 @@ import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
 import superapp.service.FitnessCalculatorService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service("FitnessCalculator")
 public class FitnessCalculatorServiceImpl implements FitnessCalculatorService {
 
@@ -171,6 +174,16 @@ public class FitnessCalculatorServiceImpl implements FitnessCalculatorService {
                         JsonNode rootNode = objectMapper.readTree(response);
                         JsonNode dataNode = rootNode.path("data");
                         DailyCalorieBudgetResult dailyCalorieBudget = objectMapper.treeToValue(dataNode, DailyCalorieBudgetResult.class);
+                        Map<String, Object> details = new HashMap<>();
+                        details.put("calories budget", dailyCalorieBudget);
+                        object.setObjectDetails(details);
+                        objectRepository
+                                .save(object)
+//                                .map(SuperAppObjectBoundary::new)
+//                                .doOnSuccess(obj ->{
+//                                   int reciveCalories = obj.getObjectDetails().getOrDefault("calories budget",dailyCalorieBudget.getDailyCalories());
+//                                })
+                                .log();
                         return Mono.just((Object)dailyCalorieBudget);
                     } catch (JsonProcessingException e) {
                         logger.error("Error parsing JSON response", e);

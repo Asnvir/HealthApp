@@ -71,11 +71,26 @@ public class SuperAppObjectController {
                                    @RequestParam String userSuperapp,
                                       @RequestParam String userEmail
     ) {
+
+        if (checkFieldsValidation(superApp, id, objectToUpdate, userSuperapp, userEmail)) {
+            logger.error("Error updating object: Required fields are null");
+            return Mono.error(new IllegalArgumentException("Required fields are null"));
+        }
         logger.info("In controller updateObject method - superApp: {}, ID: {}, userToUpdate: {}"
                 , superApp, id, objectToUpdate);
         return superAppObjectService.update(superApp, objectToUpdate, id, userSuperapp, userEmail)
                 .doOnSuccess(success -> logger.info("Object updated successfully for userId: {}", id))
                 .doOnError(error -> logger.error("Error updating object for userId: {}", id));
+    }
+
+
+    private boolean checkFieldsValidation(String superApp, String id,
+                                          SuperAppObjectBoundary objectToUpdate,
+                                          String userSuperapp, String userEmail) {
+        if (superApp == null || id == null || objectToUpdate == null
+                || userSuperapp == null || userEmail == null)
+            return false;
+        return true;
     }
 
     @GetMapping(
