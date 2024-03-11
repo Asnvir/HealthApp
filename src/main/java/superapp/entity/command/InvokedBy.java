@@ -1,9 +1,14 @@
 package superapp.entity.command;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import superapp.entity.user.UserId;
 
+import static superapp.common.Consts.COMMAND_INVOKEDBY_USERID;
+
 public class InvokedBy{
+
+	@JsonProperty(COMMAND_INVOKEDBY_USERID)
 	private UserId userId;
 
 	public InvokedBy() {

@@ -1,9 +1,16 @@
 package superapp.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
+import static superapp.common.Consts.OBJECT_CREATED_BY_USERID_EMAIL;
+import static superapp.common.Consts.OBJECT_CREATED_BY_USERID_SUPERAPP;
+
 public class UserId implements Serializable {
+    @JsonProperty(OBJECT_CREATED_BY_USERID_SUPERAPP)
     private String superapp;
+    @JsonProperty(OBJECT_CREATED_BY_USERID_EMAIL)
     private String email;
 
     public UserId() {

@@ -1,5 +1,7 @@
 package superapp.repository;
 
+import com.mongodb.lang.NonNullApi;
+import org.apache.logging.log4j.LogBuilder;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,7 +22,6 @@ public interface ObjectRepository extends
 	public Flux<SuperAppObjectEntity> findByAlias(@Param("alias")String alias);
 
 	public Flux<SuperAppObjectEntity> findByAliasRegex(@Param("pattern")String pattern);
-
 
 
 }

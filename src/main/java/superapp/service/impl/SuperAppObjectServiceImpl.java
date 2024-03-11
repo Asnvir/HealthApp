@@ -2,6 +2,7 @@ package superapp.service.impl;
 
 import java.util.Date;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import superapp.boundary.object.SuperAppObjectBoundary;
 import superapp.boundary.object.SuperAppObjectIdBoundary;
+import superapp.common.Consts;
 import superapp.entity.object.SuperAppObjectEntity;
 import superapp.entity.object.ObjectId;
 import superapp.entity.user.UserRole;
@@ -20,10 +22,12 @@ import superapp.exception.InvalidInputException;
 import superapp.exception.NotFoundException;
 import superapp.repository.ObjectRepository;
 import superapp.service.FitnessCalculatorService;
+import superapp.service.RecipeManagerService;
 import superapp.service.SuperAppObjectService;
 import superapp.service.UserService;
 import superapp.utils.EmailChecker;
 import superapp.utils.Validator;
+
 import static superapp.common.Consts.APPLICATION_NAME;
 import static superapp.exception.Consts.SUPER_APP_PERMISSION_EXCEPTION;
 
@@ -53,26 +57,17 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
     public Mono<SuperAppObjectBoundary> create(SuperAppObjectBoundary object) {
         logger.info("Creating object {}", object);
         validateObject(object);
-        String email = object.getCreatedBy().getUserId().getEmail();
-        String superApp = object.getCreatedBy().getUserId().getSuperapp();
-        return userService.isValidUserCredentials(email, superApp, UserRole.ADMIN)
-                .flatMap(isValid -> {
-                    if (Boolean.TRUE.equals(isValid)) {
-                        return Mono.error(new IllegalAccessException("Admin cannot create objects"));
-                    }
-                    object.setObjectId(new SuperAppObjectIdBoundary(environment.getProperty(APPLICATION_NAME), UUID.randomUUID().toString()));
-                    object.setCreationTimestamp(new Date());
-
-                    try {
-                        handleObjectCreation(object);
-                    } catch (Exception e) {
-                        object.setActive(false);
-                        logger.error("Error creating object", e);
-                    }
-                    return this.objectRep.save(object.toEntity())
-                            .map(SuperAppObjectBoundary::new)
-                            .doOnSuccess(createdObject -> logger.info("Object created successfully: {}", createdObject));
-                })
+        object.setObjectId(new SuperAppObjectIdBoundary(environment.getProperty(APPLICATION_NAME), UUID.randomUUID().toString()));
+        object.setCreationTimestamp(new Date());
+        try {
+            handleObjectCreation(object);
+        } catch (Exception e) {
+            object.setActive(false);
+            logger.error("Error creating object", e);
+        }
+        return this.objectRep
+                .save(object.toEntity())
+                .map(SuperAppObjectBoundary::new)
                 .log();
     }
 
@@ -84,6 +79,10 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
                 fitnessCalculatorService = this.applicationContext.getBean("FitnessCalculator", FitnessCalculatorService.class);
                 fitnessCalculatorService.handleObjectByType(object);
             }
+            case Consts.RECIPE_TYPE -> {
+                RecipeManagerService recipeManagerService = applicationContext.getBean(Consts.MINI_APP_NAME_RECIPE_MANAGER, RecipeManagerService.class);
+                recipeManagerService.handleObjectByType(object);
+            }
             default -> {
                 throw new InvalidInputException("Invalid object type");
             }
@@ -94,7 +93,7 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
     public Mono<Void> update(String superApp, SuperAppObjectBoundary objectToUpdate, String id, String userSuperapp, String email) {
         ObjectId objectId = new ObjectId(superApp, id);
 
-        return userService.isValidUserCredentials(email,superApp, UserRole.SUPERAPP_USER)
+        return userService.isValidUserCredentials(email, superApp, UserRole.SUPERAPP_USER)
                 .flatMap(isValid -> {
                     if (!Boolean.TRUE.equals(isValid)) {
                         return Mono.error(new IllegalAccessException(SUPER_APP_PERMISSION_EXCEPTION));
@@ -129,14 +128,14 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
     @Override
     public Mono<SuperAppObjectBoundary> get(String superapp, String id, String userSuperapp, String email) {
         ObjectId objectId = new ObjectId(superapp, id);
-        return userService.isValidUserCredentials(email,userSuperapp, UserRole.SUPERAPP_USER)
+        return userService.isValidUserCredentials(email, userSuperapp, UserRole.SUPERAPP_USER)
                 .flatMap(isSuperAppUser -> {
                     if (Boolean.TRUE.equals(isSuperAppUser)) {
                         return this.objectRep.findById(objectId)
                                 .map(SuperAppObjectBoundary::new)
                                 .log();
                     } else {
-                        return userService.isValidUserCredentials(email,userSuperapp, UserRole.MINIAPP_USER)
+                        return userService.isValidUserCredentials(email, userSuperapp, UserRole.MINIAPP_USER)
                                 .flatMap(isMiniAppUser -> {
                                     if (Boolean.TRUE.equals(isMiniAppUser)) {
                                         return this.objectRep.findById(objectId)
@@ -155,34 +154,34 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
     @Override
     public Flux<SuperAppObjectBoundary> getAll(String superapp, String email) {
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findAll().map(SuperAppObjectBoundary::new).log();
-        return filterObjectsBasedOnUserRole(email,superapp, objects);
+        return filterObjectsBasedOnUserRole(email, superapp, objects);
     }
 
     @Override
     public Flux<SuperAppObjectBoundary> getObjectsByType(String type, String superApp, String email) {
-    	checkValidationBeforeGetCommands(type,superApp,email);
+        checkValidationBeforeGetCommands(type, superApp, email);
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findByType(type)
                 .map(SuperAppObjectBoundary::new)
                 .log();
 
-        return filterObjectsBasedOnUserRole(email,superApp, objects);
+        return filterObjectsBasedOnUserRole(email, superApp, objects);
     }
 
     @Override
     public Flux<SuperAppObjectBoundary> getObjectsByAlias(String alias, String superApp, String email) {
-    	checkValidationBeforeGetCommands(alias,superApp,email);
+        checkValidationBeforeGetCommands(alias, superApp, email);
         Flux<SuperAppObjectBoundary> objects = this.objectRep.findByAlias(alias)
                 .map(SuperAppObjectBoundary::new)
                 .log();
 
-        return filterObjectsBasedOnUserRole(email,superApp, objects);
+        return filterObjectsBasedOnUserRole(email, superApp, objects);
     }
 
-    private Flux<SuperAppObjectBoundary> filterObjectsBasedOnUserRole(String email,String superApp, Flux<SuperAppObjectBoundary> objects) {
-        Mono<UserRole> userRoleMono = userService.isValidUserCredentials(email,superApp, UserRole.SUPERAPP_USER)
+    private Flux<SuperAppObjectBoundary> filterObjectsBasedOnUserRole(String email, String superApp, Flux<SuperAppObjectBoundary> objects) {
+        Mono<UserRole> userRoleMono = userService.isValidUserCredentials(email, superApp, UserRole.SUPERAPP_USER)
                 .flatMap(isSuperAppUser -> isSuperAppUser ? Mono.just(UserRole.SUPERAPP_USER) : Mono.empty())
                 .switchIfEmpty(
-                        userService.isValidUserCredentials(email,superApp, UserRole.MINIAPP_USER)
+                        userService.isValidUserCredentials(email, superApp, UserRole.MINIAPP_USER)
                                 .flatMap(isMiniAppUser -> isMiniAppUser ? Mono.just(UserRole.MINIAPP_USER) : Mono.empty())
                 );
 
@@ -222,22 +221,22 @@ public class SuperAppObjectServiceImpl implements SuperAppObjectService {
             throw new IllegalArgumentException("Invalid createdBy user email");
         }
     }
-    
+
     private void checkValidationBeforeGetCommands(String type, String superApp, String email) {
-    	if(type == null || superApp == null || email == null)
-    		throw new InvalidInputException("One or more of the inputs are null.");
-    	if(!EmailChecker.isValidEmail(email))
-    		throw new InvalidInputException("Invalid user details.");
+        if (type == null || superApp == null || email == null)
+            throw new InvalidInputException("One or more of the inputs are null.");
+        if (!EmailChecker.isValidEmail(email))
+            throw new InvalidInputException("Invalid user details.");
     }
-	
-	@Override
-	public Flux<SuperAppObjectBoundary> findByAliasContaining(String pattern, String superApp, String email) {
-	    checkValidationBeforeGetCommands(pattern, superApp, email);
-	    Flux<SuperAppObjectBoundary> objects = this.objectRep.findByAliasRegex(".*" + pattern + ".*")
-	            .map(SuperAppObjectBoundary::new)
-	            .log();
-	    
-	    return filterObjectsBasedOnUserRole(email,superApp, objects);
-	}
+
+    @Override
+    public Flux<SuperAppObjectBoundary> findByAliasContaining(String pattern, String superApp, String email) {
+        checkValidationBeforeGetCommands(pattern, superApp, email);
+        Flux<SuperAppObjectBoundary> objects = this.objectRep.findByAliasRegex(".*" + pattern + ".*")
+                .map(SuperAppObjectBoundary::new)
+                .log();
+
+        return filterObjectsBasedOnUserRole(email, superApp, objects);
+    }
 
 }
